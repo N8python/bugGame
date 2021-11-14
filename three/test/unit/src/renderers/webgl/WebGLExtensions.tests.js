@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions';
+import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions.js';
 
 export default QUnit.module( 'Renderers', () => {
 

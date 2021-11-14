@@ -1,4 +1,4 @@
-import * as THREE from '../..';
+import * as THREE from '../...js';
 
 let camera, scene, renderer;
 

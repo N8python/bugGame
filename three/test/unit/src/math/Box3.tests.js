@@ -1,21 +1,21 @@
 /* global QUnit */
 
-import { Box3 } from '../../../../src/math/Box3';
-import { Sphere } from '../../../../src/math/Sphere';
-import { Triangle } from '../../../../src/math/Triangle';
-import { Plane } from '../../../../src/math/Plane';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Mesh } from '../../../../src/objects/Mesh';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { Box3 } from '../../../../src/math/Box3.js';
+import { Sphere } from '../../../../src/math/Sphere.js';
+import { Triangle } from '../../../../src/math/Triangle.js';
+import { Plane } from '../../../../src/math/Plane.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import {
 	negInf3,
 	posInf3,
 	zero3,
 	one3,
 	two3
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 function compareBox( a, b, threshold ) {
 

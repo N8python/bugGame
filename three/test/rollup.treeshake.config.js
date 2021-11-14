@@ -3,7 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import filesize from 'rollup-plugin-filesize';
 import { terser } from 'rollup-plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { glconstants, glsl } from '../utils/build/rollup.config';
+import { glconstants, glsl } from '../utils/build/rollup.config.js';
 import chalk from 'chalk';
 
 const statsFile = path.resolve( __dirname, './treeshake/stats.html' );

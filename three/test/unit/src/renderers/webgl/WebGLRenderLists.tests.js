@@ -1,8 +1,8 @@
 /* global QUnit */
 
-import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists';
-import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties';
-import { Scene } from '../../../../../src/scenes/Scene';
+import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists.js';
+import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties.js';
+import { Scene } from '../../../../../src/scenes/Scene.js';
 
 export default QUnit.module( 'Renderers', () => {
 

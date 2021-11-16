@@ -10,6 +10,12 @@ class Lever {
         this.mesh = mesh.clone();
         this.mesh.position.copy(position);
         this.mesh.scale.set(2.0, 2.0, 2.0);
+        this.head = null;
+        this.mesh.traverse(child => {
+            if (child.isMesh && child.name === "Cube005") {
+                this.head = child;
+            }
+        })
         this.pushed = false;
         this.camera = camera;
         this.mixer = new THREE.AnimationMixer(this.mesh);
@@ -47,6 +53,9 @@ class Lever {
                 chosenButton.material = station.greenMaterial;
                 chosenButton.material.needsUpdate = true;
                 chosenButton.needsUpdate = true;
+                this.head.material = station.greenMaterial;;
+                this.head.material.needsUpdate = true;
+                this.head.needsUpdate = true;
             }
         }
     }

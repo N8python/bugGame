@@ -3,6 +3,7 @@ import WeaponController from './WeaponController.js';
 import Lever from './Lever.js';
 import Projectile from './Projectile.js';
 import Station from './Station.js';
+import { DecalGeometry } from "./three/examples/jsm/geometries/DecalGeometry.js";
 
 function angleDifference(angle1, angle2) {
     const diff = ((angle2 - angle1 + Math.PI) % (Math.PI * 2)) - Math.PI;
@@ -17,7 +18,11 @@ class PlayerController {
         tileMap,
         sourceMap,
         heightMap,
-        entities
+        entities,
+        dentMap,
+        levelMesh,
+        scene,
+        decals
     }) {
         this.entities = entities;
         this.tileMap = tileMap;
@@ -26,6 +31,7 @@ class PlayerController {
         this.position = position;
         this.camera = camera;
         this.height = height;
+        this.scene = scene;
         this.controls = controls;
         this.velocity = new THREE.Vector3();
         this.onGround = true;
@@ -35,12 +41,24 @@ class PlayerController {
         this.healthLoss = 0;
         this.controls.getObject().velocity = this.velocity;
         this.raycaster = new THREE.Raycaster();
+        this.dentMaterial = dentMap;
+        this.levelMesh = levelMesh;
+        this.decals = decals;
     }
     getPosition() {
         return this.controls.getObject().position;
     }
     takeDamage(amt) {
-        const oldHealth = this.health
+        if (this.weaponState === "block") {
+            amt -= 5;
+            amt = Math.max(amt, 0);
+            this.weaponState = "cooldown";
+            this.weaponController.addTargetPosition(0, -1.0, 0, 0.3);
+            this.weaponController.addTargetRotation(0, 0, 0, 0.3);
+            this.weaponController.addTargetPosition(0, 0, 0, 0.45);
+            this.weaponController.addTargetRotation(0, 0, 0, 0.45);
+        }
+        const oldHealth = this.health;
         this.health -= amt;
         this.health = Math.max(this.health, 0);
         this.healthLoss += oldHealth - this.health;
@@ -205,7 +223,7 @@ class PlayerController {
                     if (Math.abs(angleDifference(theta, yDir)) < span || entityDist < 3) {
                         const awayVelocity = this.getPosition().clone().sub(entity.mesh.position.clone()).normalize().multiplyScalar(-2);
                         entity.velocity.add(awayVelocity);
-                        entity.mesh.lookAt(entity.mesh.position.clone().add(awayVelocity));
+                        entity.mesh.lookAt(entity.mesh.position.clone().add(entity.velocity));
                         entity.sourceEntity = null;
                     }
                 }
@@ -213,37 +231,61 @@ class PlayerController {
         })
     }
     registerClick(input, keys) {
+        let doDent = false;
         if (this.weaponState === "idle") {
             if (keys["shift"]) {
-                this.weaponController.addTargetPosition(-1.5, 0, 0, 0.35, { leftBound: -Math.PI / 4, rightBound: Math.PI / 4, strength: 1.5 });
-                this.weaponController.addTargetPosition(0, 0, 0, 0.35);
-                this.weaponController.addTargetRotation(-0.9, 1, 0, 0.35);
-                this.weaponController.addTargetRotation(0, 0, 0, 0.35);
-                this.handleSwing({ span: Math.PI / 4, strength: 1.5 })
-                this.weaponState = "slash";
-            } else if (input.button === 2) {
-                this.weaponController.addTargetPosition(-0.5, 0, 0, 0.2);
-                this.weaponController.addTargetRotation(-0.3, 1, 0.5, 0.2);
-                this.weaponState = "block";
-            } else {
-                this.weaponController.addTargetPosition(-0.3, 0.1, 0.0025, 0.2, { leftBound: -Math.PI / 8, rightBound: Math.PI / 6, strength: 1 });
+                this.weaponController.addTargetPosition(-0.3, 0.1, 0.0025, 0.2);
                 this.weaponController.addTargetPosition(0, 0, 0, 0.2);
                 this.weaponController.addTargetRotation(-0.5, -0.3, 0.3, 0.2);
                 this.weaponController.addTargetRotation(0, 0, 0, 0.2);
                 this.handleSwing({ span: Math.PI / 4, strength: 1 })
                 this.weaponState = "attack";
                 this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
+                doDent = true;
                 this.entities.forEach(entity => {
                     if (entity instanceof Lever) {
                         if (this.raycaster.ray.intersectsBox(entity.box.clone().expandByScalar(1.5))) {
                             entity.push();
+                            doDent = false;
                         }
                     } else if (entity instanceof Station) {
                         if (this.raycaster.ray.intersectsBox(entity.box)) {
                             entity.push();
+                            doDent = false;
                         }
                     }
-                })
+                });
+            } else if (input.button === 2) {
+                this.weaponController.addTargetPosition(-0.5, 0, 0, 0.2);
+                this.weaponController.addTargetRotation(-0.3, 1, 0.5, 0.2);
+                this.weaponState = "block";
+            } else {
+                this.weaponController.addTargetPosition(-1.5, 0, 0, 0.35);
+                this.weaponController.addTargetPosition(0, 0, 0, 0.35);
+                this.weaponController.addTargetRotation(-0.9, 1, 0, 0.35);
+                this.weaponController.addTargetRotation(0, 0, 0, 0.35);
+                this.handleSwing({ span: Math.PI / 4, strength: 1.5, range: 7.5 });
+                this.weaponState = "slash";
+                doDent = true;
+            }
+        }
+        if (doDent) {
+            this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
+            const intersections = this.raycaster.intersectObject(this.levelMesh, false);
+            const mouseHelper = new THREE.Object3D();
+            if (intersections.length > 0 && intersections[0].point.distanceTo(this.getPosition()) < 12.5) {
+                mouseHelper.position.copy(intersections[0].point);
+                const n = intersections[0].face.normal.clone();
+                n.transformDirection(this.levelMesh.matrixWorld);
+                n.multiplyScalar(10);
+                n.add(intersections[0].point);
+                mouseHelper.rotation.z = 0;
+                mouseHelper.lookAt(n);
+                mouseHelper.rotation.z = Math.random() * 2 * Math.PI;
+                const size = Math.random() * 5 + 7.5;
+                const m = new THREE.Mesh(new DecalGeometry(this.levelMesh, intersections[0].point, mouseHelper.rotation, new THREE.Vector3(size, size, size)), this.dentMaterial);
+                this.scene.add(m);
+                this.decals.push(m);
             }
         }
     }

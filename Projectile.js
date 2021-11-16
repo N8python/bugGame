@@ -69,8 +69,10 @@ class Projectile {
                         return true;
                     }
                     if (entity === this.playerController) {
-                        this.playerController.velocity.add(new THREE.Vector3(this.velocity.x, 0.3 + 0.3 * Math.random(), this.velocity.z));
-                        this.playerController.onGround = false;
+                        if (this.playerController.weaponState !== "block") {
+                            this.playerController.velocity.add(new THREE.Vector3(this.velocity.x, 0.3 + 0.3 * Math.random(), this.velocity.z));
+                            this.playerController.onGround = false;
+                        }
                         this.playerController.takeDamage(this.damage);
                     } else {
                         entity.takeDamage(this.damage, new THREE.Vector3(this.velocity.x, 0.1 + 0.1 * Math.random(), this.velocity.z));

@@ -1,11 +1,13 @@
 import * as THREE from './three/build/three.module.js';
 import * as SkeletonUtils from "./three/examples/jsm/utils/SkeletonUtils.js";
+import Emitter from './Emitter.js';
 
 function angleDifference(angle1, angle2) {
     const diff = ((angle2 - angle1 + Math.PI) % (Math.PI * 2)) - Math.PI;
     return (diff < -Math.PI) ? diff + (Math.PI * 2) : diff;
 }
-class Ant {
+const texLoader = new THREE.TextureLoader();
+class Beetle {
     constructor(model, animations, {
         position,
         scene,
@@ -14,29 +16,46 @@ class Ant {
         sourceMap,
         heightMap,
         entities,
+        camera,
         playerController
     }) {
-        this.mesh = SkeletonUtils.clone(model);
-        this.antennae = [];
-        this.mesh.traverse(child => {
-            if (child.name.startsWith("BezierCurve")) {
-                this.antennae.push(child);
-            }
+        this.mesh = model.clone();
+        this.mesh.scale.set(15, 15, 15);
+        this.smokeMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            blending: THREE.NormalBlending,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.25,
+            alphaMap: texLoader.load("assets/smoke.jpeg"),
+            depthTest: true,
+            depthWrite: false,
         });
+        this.smokeEmitter = new Emitter(new THREE.PlaneGeometry(1, 1), this.smokeMaterial, 500, {
+            deleteOnSize: 0.001,
+            deleteOnDark: 0.01
+        });
+        this.camera = camera;
+        this.antennae = [];
         this.legs = [];
+        this.abdomen = null;
         this.mesh.traverse(child => {
-            if (child.isObject3D && !child.isBone && !child.isSkinnedMesh) {
-                if (child.name.startsWith("Armature")) {
+            if (child.isMesh) {
+                if (child.name.includes("Leg")) {
                     this.legs.push(child);
+                }
+                if (child.name.includes("Abdomen")) {
+                    this.abdomen = child;
                 }
             }
         });
+        this.abdomen.material = this.abdomen.material.clone();
         this.entities = entities;
         this.playerController = playerController;
         this.tileMap = tileMap;
         this.sourceMap = sourceMap;
         this.heightMap = heightMap;
-        this.height = 3.25;
+        this.height = 1.5;
         this.direction = direction;
         this.pitch = 0;
         this.flinch = 0;
@@ -67,7 +86,7 @@ class Ant {
                 swayAmt: Math.random() * 0.06 + 0.06
             }
         };
-        const maxHealth = 50 + 25 * Math.random();
+        const maxHealth = 25 + 25 * Math.random();
         this.memory = {
             health: maxHealth,
             maxHealth: maxHealth
@@ -99,14 +118,15 @@ class Ant {
             this.die(velocity);
         } else {
             this.velocity.add(velocity);
-            this.velocity.y += 0.5 + Math.random() * 0.5;
+            this.velocity.y += 0.75 + Math.random() * 0.75;
         }
-        this.targetFlinch = 0.2 + 0.2 * Math.random();
+        this.targetFlinch = 0.5 + 0.5 * Math.random();
         const healthFactor = this.memory.health / this.memory.maxHealth;
         if ((healthFactor < 0.75 && this.legs.length === 6) ||
             (healthFactor < 0.5 && this.legs.length === 5) ||
             (healthFactor < 0.25 && this.legs.length === 4)) {
             const chosenLeg = this.legs[Math.floor(Math.random() * this.legs.length)];
+            console.log(chosenLeg);
             this.legs.splice(this.legs.indexOf(chosenLeg), 1);
             this.deadParts.push(chosenLeg);
             this.scene.attach(chosenLeg);
@@ -122,6 +142,10 @@ class Ant {
         }
         this.state.type = "dead";
         this.state.memory = {};
+        this.abdomen.scale.set(0.588677704334259, 0.3077686131000519, 0.4784911870956421);
+        this.abdomen.material.color.r = 1;
+        this.abdomen.material.color.g = 1;
+        this.abdomen.material.color.b = 1;
         this.animations.forEach(animation => {
             animation.timeScale = 0;
             animation.stop();
@@ -139,16 +163,57 @@ class Ant {
                 this.deadParts.push(child);
             }
         });
+        const explosionCenter = this.abdomen.getWorldPosition(new THREE.Vector3());
         this.deadParts.forEach(part => {
             this.scene.attach(part);
             this.deadVelocities.push([
                 new THREE.Vector3(Math.random() * 0.25 - 0.125 + startingVelocity.x, -0.05 + Math.random() * 0.25 + startingVelocity.y, Math.random() * 0.25 - 0.125 + startingVelocity.z),
                 new THREE.Vector3(Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1)
             ]);
+            if (this.exploded) {
+                this.deadVelocities[this.deadVelocities.length - 1][0].add(part.getWorldPosition(new THREE.Vector3()).sub(explosionCenter).normalize().multiplyScalar(0.5));
+                this.deadVelocities[this.deadVelocities.length - 1][0].y += 0.35 + 0.35 * Math.random();
+            }
         });
+        if (this.exploded) {
+            for (let i = 0; i < 500; i++) {
+                const smokeDir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+                const saturation = 0.875 + Math.random() * 0.25;
+                this.smokeEmitter.emit({
+                    position: new THREE.Vector3(0, -5, 0).add(this.abdomen.getWorldPosition(new THREE.Vector3())),
+                    rotation: new THREE.Vector3(0.0, 0.0, Math.random() * Math.PI * 2),
+                    scale: new THREE.Vector3(10.0, 10.0, 10.0),
+                    speed: 1,
+                    size: 1,
+                    color: new THREE.Vector3(saturation, saturation, saturation).multiplyScalar(0.5),
+                    //colorDecay: 0.9,
+                    velocityDecay: 0.95,
+                    velocity: {
+                        position: smokeDir.add(new THREE.Vector3(0.1 - 0.2 * Math.random(), 0.2 + 0.1 * Math.random(), 0.1 - 0.2 * Math.random())).multiplyScalar(1),
+                        rotation: new THREE.Vector3(0.0, 0.0, 0.0),
+                        scale: new THREE.Vector3(0.0, 0.0, 0.0),
+                        speed: 0,
+                        size: -0.002 + -0.002 * Math.random()
+                    },
+                    billboard: true
+                });
+            }
+        }
     }
     update(delta, frustum) {
         this.updateBox();
+        if (this.exploded) {
+            if (!this.explodeTime) {
+                this.explodeTime = 0;
+            }
+            this.explodeTime += delta;
+            this.smokeMaterial.opacity = 0.25 - (Math.sqrt(this.explodeTime + 1) - 1) / ((this.explodeTime + 1) ** 1 / 4) * 0.25;
+            if (this.smokeMaterial.opacity <= 0) {
+                this.scene.remove(this.smokeEmitter);
+                this.exploded = false;
+            }
+            this.smokeEmitter.update(delta, this.camera);
+        }
         this.health = Math.max(this.health, 0);
         this.antennae.forEach(antenna => {
             antenna.rotation.x = (Math.PI / 3) * (1 - this.memory.health / this.memory.maxHealth);
@@ -213,7 +278,7 @@ class Ant {
                 this.velocity.add(toTarget.multiplyScalar(0.01));
             } else {
                 this.state = {
-                    type: "bite",
+                    type: "explode",
                     memory: {
                         time: 0,
                         target: this.state.memory.target
@@ -221,36 +286,61 @@ class Ant {
                 }
             }
         }
-        if (this.state.type === "bite") {
-            this.state.memory.time += delta * 4.0;
-            const pitch = 0.5 * Math.abs(Math.sin(this.state.memory.time));
-            if (this.state.memory.time > Math.PI) {
-                /*this.mesh.rotation.x = 0;
-                this.mesh.rotation.y = this.direction;
-                this.mesh.rotation.z = 0;*/
-                const toTarget = this.state.memory.target.position.clone().sub(this.mesh.position).normalize().multiplyScalar(0.5);
-                toTarget.y = 0.3 + 0.3 * Math.random();
-                const distanceScale = Math.max(1.0 - this.box.distanceToPoint(this.state.memory.target.position) / 15, 0);
-                toTarget.multiplyScalar(distanceScale);
-                if (this.state.memory.target === this.playerController.controls.getObject()) {
-                    if (this.playerController.weaponState !== "block") {
-                        this.state.memory.target.velocity.add(toTarget);
-                        this.playerController.onGround = false;
-                    }
-                    this.playerController.takeDamage((3 + 3 * Math.random()) * distanceScale);
-                } else {
-                    this.state.memory.target.takeDamage(3 + 3 * Math.random(), toTarget);
-                }
-                this.state = {
-                    type: "attack",
-                    memory: {
-                        target: this.state.memory.target
+        if (this.state.type === "explode") {
+            this.state.memory.time += delta;
+            const beatPhase = this.state.memory.time * Math.min(Math.max(this.state.memory.time * 7.5, 7.5), 12.5);
+            this.abdomen.scale.set(0.588677704334259 + 0.15 * Math.abs(Math.sin(beatPhase)), 0.3077686131000519 + 0.15 * Math.abs(Math.sin(beatPhase)), 0.4784911870956421 + 0.15 * Math.abs(Math.sin(beatPhase)));
+            this.abdomen.material.color.r = 1 + 10 * Math.abs(Math.sin(beatPhase));
+            this.abdomen.material.color.g = 1 + 10 * Math.abs(Math.sin(beatPhase));
+            this.abdomen.material.color.b = 1 + 10 * Math.abs(Math.sin(beatPhase));
+            let angleToTarget = Math.atan2(this.state.memory.target.position.x - this.mesh.position.x, this.state.memory.target.position.z - this.mesh.position.z);
+            this.direction += angleDifference(this.direction, angleToTarget) / 10;
+            if (this.state.memory.time > 1.5) {
+                this.abdomen.visible = false;
+                this.exploded = true;
+                this.scene.add(this.smokeEmitter);
+                this.dealExplosionDamage();
+                this.die();
+            } else {
+                const distanceToTarget = Math.hypot(this.state.memory.target.position.x - this.mesh.position.x, this.state.memory.target.position.z - this.mesh.position.z);
+                if (distanceToTarget > 22.5) {
+                    this.abdomen.scale.set(0.588677704334259, 0.3077686131000519, 0.4784911870956421);
+                    this.abdomen.material.color.r = 1;
+                    this.abdomen.material.color.g = 1;
+                    this.abdomen.material.color.b = 1;
+                    this.state = {
+                        type: "attack",
+                        memory: {
+                            target: this.state.memory.target
+                        }
                     }
                 }
             }
-            let angleToTarget = Math.atan2(this.state.memory.target.position.x - this.mesh.position.x, this.state.memory.target.position.z - this.mesh.position.z);
-            this.direction += angleDifference(this.direction, angleToTarget) / 10;
-            this.pitch = pitch;
+            /* const pitch = 0.5 * Math.abs(Math.sin(this.state.memory.time));
+             if (this.state.memory.time > Math.PI) {
+                 const toTarget = this.state.memory.target.position.clone().sub(this.mesh.position).normalize().multiplyScalar(0.5);
+                 toTarget.y = 0.3 + 0.3 * Math.random();
+                 const distanceScale = Math.max(1.0 - this.box.distanceToPoint(this.state.memory.target.position) / 15, 0);
+                 toTarget.multiplyScalar(distanceScale);
+                 if (this.state.memory.target === this.playerController.controls.getObject()) {
+                     if (this.playerController.weaponState !== "block") {
+                         this.state.memory.target.velocity.add(toTarget);
+                         this.playerController.onGround = false;
+                     }
+                     this.playerController.takeDamage((3 + 3 * Math.random()) * distanceScale);
+                 } else {
+                     this.state.memory.target.takeDamage(3 + 3 * Math.random(), toTarget);
+                 }
+                 this.state = {
+                     type: "attack",
+                     memory: {
+                         target: this.state.memory.target
+                     }
+                 }
+             }
+             let angleToTarget = Math.atan2(this.state.memory.target.position.x - this.mesh.position.x, this.state.memory.target.position.z - this.mesh.position.z);
+             this.direction += angleDifference(this.direction, angleToTarget) / 10;*/
+            // this.pitch = pitch;
             //this.mesh.lookAt(new THREE.Vector3(this.mesh.position.x + Math.sin(this.direction), this.mesh.position.y + pitch, this.mesh.position.z + Math.cos(this.direction)));;
         }
         if (!this.dying) {
@@ -284,7 +374,7 @@ class Ant {
                 part.deathTimer = 0;
             }
             part.deathTimer += delta;
-            if (part.deathTimer > 1) {
+            if (part.deathTimer > (this.exploded ? 2.5 : 1)) {
                 part.scale.multiplyScalar(0.95);
             }
             if (part.scale.x < 0.001) {
@@ -331,6 +421,37 @@ class Ant {
             }
         }
     }
+    dealExplosionDamage() {
+        const explosionCenter = this.abdomen.getWorldPosition(new THREE.Vector3());
+        const explosionRadius = 50;
+        [this.playerController, ...this.entities].forEach(entity => {
+            if (!entity.takeDamage) {
+                return;
+            }
+            if (entity === this) {
+                return;
+            }
+            let entityDist;
+            let awayVector;
+            if (entity === this.playerController) {
+                entityDist = entity.getPosition().distanceTo(explosionCenter);
+                awayVector = entity.getPosition().clone().sub(explosionCenter).normalize();
+            } else {
+                entityDist = entity.mesh.position.distanceTo(explosionCenter);
+                awayVector = entity.mesh.position.clone().sub(explosionCenter).normalize();
+            }
+            let explosionFactor = 1 - entityDist / explosionRadius;
+            if (entityDist < explosionRadius) {
+                if (entity === this.playerController) {
+                    this.playerController.velocity.add(new THREE.Vector3(awayVector.x * 1.5, 0.75 + 0.75 * Math.random(), awayVector.z * 1.5).multiplyScalar(explosionFactor));
+                    this.playerController.onGround = false;
+                    this.playerController.takeDamage((50 + 50 * Math.random()) * explosionFactor);
+                } else {
+                    entity.takeDamage((50 + 50 * Math.random()) * explosionFactor, new THREE.Vector3(awayVector.x * 1.5, 0.1 + 0.1 * Math.random(), awayVector.z * 1.5).multiplyScalar(explosionFactor));
+                }
+            }
+        })
+    }
     intersectWall() {
         const verticesToCheck = [
             new THREE.Vector3(this.mesh.position.x + 8 * Math.sin(this.direction), this.mesh.position.y, this.mesh.position.z + 8 * Math.cos(this.direction)),
@@ -359,9 +480,9 @@ class Ant {
             new THREE.Vector3(this.mesh.position.x - 8 * Math.sin(this.direction), this.mesh.position.y, this.mesh.position.z - 8 * Math.cos(this.direction)),
             new THREE.Vector3(this.mesh.position.x + 5 * Math.sin(this.direction + Math.PI / 2), this.mesh.position.y, this.mesh.position.z + 5 * Math.cos(this.direction + Math.PI / 2)),
             new THREE.Vector3(this.mesh.position.x - 5 * Math.sin(this.direction + Math.PI / 2), this.mesh.position.y, this.mesh.position.z - 5 * Math.cos(this.direction + Math.PI / 2)),
-            new THREE.Vector3(this.mesh.position.x, this.mesh.position.y + 3.75, this.mesh.position.z),
-            new THREE.Vector3(this.mesh.position.x, this.mesh.position.y - 3.75, this.mesh.position.z),
+            new THREE.Vector3(this.mesh.position.x, this.mesh.position.y + 5, this.mesh.position.z),
+            new THREE.Vector3(this.mesh.position.x, this.mesh.position.y - 1, this.mesh.position.z),
         ]);
     }
 }
-export default Ant;
+export default Beetle;

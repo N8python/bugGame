@@ -202,7 +202,7 @@ class Bee {
         if (!this.dying) {
             this.entities.forEach(entity => {
                 if (entity !== this && entity !== this.lastProjectile) {
-                    if (entity.box.intersectsBox(this.box)) {
+                    if (entity.box.intersectsBox(this.box) && !entity.dying) {
                         const away = entity.box.getCenter(new THREE.Vector3()).sub(this.box.getCenter(new THREE.Vector3()));
                         this.velocity.add(away.multiplyScalar(-0.01));
                     }

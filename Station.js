@@ -2,11 +2,13 @@ import * as THREE from './three/build/three.module.js';
 import Ant from './Ant.js';
 import Bee from './Bee.js';
 import Beetle from "./Beetle.js";
+import Butterfly from './Butterfly.js';
 class Station {
     constructor(mesh, animations, {
         position,
         camera,
         entities,
+        resetFunction,
         scene
     }) {
         this.mesh = mesh.clone();
@@ -16,6 +18,7 @@ class Station {
         this.registers = [];
         this.buttons = [];
         this.finalButton = null;
+        this.resetFunction = resetFunction;
         this.mesh.traverse(child => {
             if (child.isMesh && child.name.startsWith("Register")) {
                 this.registers.push(child);
@@ -51,12 +54,13 @@ class Station {
             //const helper = new THREE.Box3Helper(this.box, 0xffff00);
             //this.scene.add(helper);
             //this.box.setFromCenterAndSize(this.mesh.position, new THREE.Vector3(10, 10, 5));
-
         this.updateBox();
         this.entities = entities;
+        this.blockPlayer = true;
+        this.pushed = false;
     }
     update(delta, frustum) {
-        const eLength = this.entities.filter(x => (x instanceof Ant || x instanceof Bee || x instanceof Beetle) && !x.dying).length;
+        const eLength = this.entities.filter(x => (x instanceof Ant || x instanceof Bee || x instanceof Beetle || x instanceof Butterfly) && !x.dying).length;
         const tens = Math.floor(eLength / 10);
         const ones = eLength % 10;
         if (!this.pushed) {
@@ -65,6 +69,15 @@ class Station {
         }
         if (eLength === 0 && this.buttons.every(button => button.on)) {
             this.finalButton.material = this.greenMaterial;
+        }
+        if (this.pushed) {
+            if (!this.pushedTimer) {
+                this.pushedTimer = 0;
+            }
+            this.pushedTimer += delta;
+        }
+        if (this.pushedTimer > 1) {
+            this.resetFunction();
         }
         this.mixer.update(delta);
     }

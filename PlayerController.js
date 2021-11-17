@@ -170,6 +170,14 @@ class PlayerController {
                 this.position.z += this.velocity.z;
             }
         }
+        this.entities.forEach(entity => {
+            if (entity.blockPlayer) {
+                if (entity.box.containsPoint(this.position)) {
+                    const away = entity.box.getCenter(new THREE.Vector3()).sub(this.position);
+                    this.velocity.add(away.multiplyScalar(-0.025));
+                }
+            }
+        })
 
         this.position.add(this.velocity); // += velocity.x;
         //playerElevation += velocity.y;

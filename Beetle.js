@@ -140,6 +140,30 @@ class Beetle {
         if (!startingVelocity) {
             startingVelocity = new THREE.Vector3(0, 0, 0);
         }
+        if (this.exploded && !this.dying) {
+            for (let i = 0; i < 500; i++) {
+                const smokeDir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+                const saturation = 0.875 + Math.random() * 0.25;
+                this.smokeEmitter.emit({
+                    position: new THREE.Vector3(0, -5, 0).add(this.abdomen.getWorldPosition(new THREE.Vector3())),
+                    rotation: new THREE.Vector3(0.0, 0.0, Math.random() * Math.PI * 2),
+                    scale: new THREE.Vector3(10.0, 10.0, 10.0),
+                    speed: 1,
+                    size: 1,
+                    color: new THREE.Vector3(saturation, saturation, saturation).multiplyScalar(0.5),
+                    //colorDecay: 0.9,
+                    velocityDecay: 0.95,
+                    velocity: {
+                        position: smokeDir.add(new THREE.Vector3(0.1 - 0.2 * Math.random(), 0.2 + 0.1 * Math.random(), 0.1 - 0.2 * Math.random())).multiplyScalar(1),
+                        rotation: new THREE.Vector3(0.0, 0.0, 0.0),
+                        scale: new THREE.Vector3(0.0, 0.0, 0.0),
+                        speed: 0,
+                        size: -0.002 + -0.002 * Math.random()
+                    },
+                    billboard: true
+                });
+            }
+        }
         this.state.type = "dead";
         this.state.memory = {};
         this.abdomen.scale.set(0.588677704334259, 0.3077686131000519, 0.4784911870956421);
@@ -175,30 +199,6 @@ class Beetle {
                 this.deadVelocities[this.deadVelocities.length - 1][0].y += 0.35 + 0.35 * Math.random();
             }
         });
-        if (this.exploded) {
-            for (let i = 0; i < 500; i++) {
-                const smokeDir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
-                const saturation = 0.875 + Math.random() * 0.25;
-                this.smokeEmitter.emit({
-                    position: new THREE.Vector3(0, -5, 0).add(this.abdomen.getWorldPosition(new THREE.Vector3())),
-                    rotation: new THREE.Vector3(0.0, 0.0, Math.random() * Math.PI * 2),
-                    scale: new THREE.Vector3(10.0, 10.0, 10.0),
-                    speed: 1,
-                    size: 1,
-                    color: new THREE.Vector3(saturation, saturation, saturation).multiplyScalar(0.5),
-                    //colorDecay: 0.9,
-                    velocityDecay: 0.95,
-                    velocity: {
-                        position: smokeDir.add(new THREE.Vector3(0.1 - 0.2 * Math.random(), 0.2 + 0.1 * Math.random(), 0.1 - 0.2 * Math.random())).multiplyScalar(1),
-                        rotation: new THREE.Vector3(0.0, 0.0, 0.0),
-                        scale: new THREE.Vector3(0.0, 0.0, 0.0),
-                        speed: 0,
-                        size: -0.002 + -0.002 * Math.random()
-                    },
-                    billboard: true
-                });
-            }
-        }
     }
     update(delta, frustum) {
         this.updateBox();

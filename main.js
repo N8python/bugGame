@@ -140,6 +140,7 @@ async function main() {
     });
     const models = {
         cobolt: await AssetManager.loadGLTFAsync("assets/cobolt.glb"),
+        pascaliber: await AssetManager.loadGLTFAsync("assets/pascaliber.glb"),
         station: await AssetManager.loadGLTFAsync("assets/station.glb"),
         lever: await AssetManager.loadGLTFAsync("assets/lever.glb"),
         ant: await AssetManager.loadGLTFAsync("assets/ant.glb"),
@@ -148,16 +149,43 @@ async function main() {
         butterfly: await AssetManager.loadGLTFAsync("assets/butterfly.glb"),
         bee: await AssetManager.loadGLTFAsync("assets/bee.glb")
     }
-    let weapon = models.cobolt.scene;
-    weapon.traverse((child) => {
+    const weapons = {
+        cobolt: {
+            damage: 10,
+            speed: 1,
+            cooldownChance: 1,
+            blockMax: 5,
+            model: models.cobolt.scene,
+            position: new THREE.Vector3(0.75, -0.5, -1),
+            rotation: new THREE.Vector3(0.1, 0.0, 0.0),
+            scale: new THREE.Vector3(0.075, 0.075, 0.075)
+        },
+        pascaliber: {
+            damage: 12.5,
+            speed: 1.5,
+            cooldownChance: 0.5,
+            blockMax: 10,
+            model: models.pascaliber.scene,
+            position: new THREE.Vector3(0.75, -0.625, -1),
+            rotation: new THREE.Vector3(0.1, 0.0, 0.0),
+            scale: new THREE.Vector3(0.35, 0.35, 0.35)
+        }
+    }
+    models.cobolt.scene.traverse((child) => {
         if (child.isMesh) {
             child.material.envMap = textures.envMap;
             child.material.normalMap = textures.metalNormal;
             child.material.needsUpdate = true;
         }
     });
-    camera.add(weapon);
-    playerController.weapon = weapon;
+    models.pascaliber.scene.traverse((child) => {
+        if (child.isMesh) {
+            child.material.envMap = textures.envMap;
+            child.material.normalMap = textures.metalNormal;
+            child.material.needsUpdate = true;
+        }
+    });
+    playerController.weapon = weapons.cobolt;
     models.ant.scene.traverse((child) => {
         if (child.isMesh) {
             child.frustumCulled = false;
@@ -260,7 +288,7 @@ async function main() {
         heightMap,
         sourceMap,
         resetFunction,
-        number: 3,
+        number: 0,
         camera
     });
     entities = level.entities;
@@ -283,6 +311,9 @@ async function main() {
         playerController.update(keys, mouseDown);
         if (mouseDown) {
             playerController.registerClick(mouseE, keys);
+        }
+        if (level.number > 2 && playerController.weapon !== weapons.pascaliber) {
+            playerController.changeWeapon(weapons.pascaliber);
         }
         const frustum = new THREE.Frustum();
         frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));

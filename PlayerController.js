@@ -50,13 +50,15 @@ class PlayerController {
     }
     takeDamage(amt) {
         if (this.weaponState === "block") {
-            amt -= 5;
+            amt -= this.weapon.blockMax;
             amt = Math.max(amt, 0);
-            this.weaponState = "cooldown";
-            this.weaponController.addTargetPosition(0, -1.0, 0, 0.3);
-            this.weaponController.addTargetRotation(0, 0, 0, 0.3);
-            this.weaponController.addTargetPosition(0, 0, 0, 0.45);
-            this.weaponController.addTargetRotation(0, 0, 0, 0.45);
+            if (Math.random() < this.weapon.cooldownChance) {
+                this.weaponState = "cooldown";
+                this.weaponController.addTargetPosition(0, -1.0, 0, 0.3 / this.weapon.speed);
+                this.weaponController.addTargetRotation(0, 0, 0, 0.3 / this.weapon.speed);
+                this.weaponController.addTargetPosition(0, 0, 0, 0.45 / this.weapon.speed);
+                this.weaponController.addTargetRotation(0, 0, 0, 0.45 / this.weapon.speed);
+            }
         }
         const oldHealth = this.health;
         this.health -= amt;
@@ -189,11 +191,12 @@ class PlayerController {
         if (this.weapon) {
             //this.weapon.position.y = -0.5 - 0.1 * (lowFreq + (highFreq - lowFreq) * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5));
             if (!this.weaponController) {
-                this.weaponController = new WeaponController(this.weapon, {
-                    position: new THREE.Vector3(0.75, -0.5, -1),
-                    rotation: new THREE.Vector3(0.1, 0.0, 0.0),
-                    scale: new THREE.Vector3(0.075, 0.075, 0.075)
-                })
+                this.weaponController = new WeaponController(this.weapon.model, {
+                    position: this.weapon.position,
+                    rotation: this.weapon.rotation,
+                    scale: this.weapon.scale
+                });
+                this.camera.add(this.weapon.model);
             } else {
                 this.weaponController.update(-0.1 * (lowFreq + (highFreq - lowFreq) * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5)));
                 if (this.weaponController.idle() && this.weaponState !== "idle" && this.weaponState !== "block") {
@@ -209,6 +212,16 @@ class PlayerController {
         //this.camera.fov = 75 + 5 * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5);
         this.camera.updateProjectionMatrix();
     }
+    changeWeapon(weapon) {
+        this.camera.remove(this.weapon.model);
+        this.weapon = weapon;
+        this.weaponController = new WeaponController(this.weapon.model, {
+            position: this.weapon.position,
+            rotation: this.weapon.rotation,
+            scale: this.weapon.scale
+        });
+        this.camera.add(this.weapon.model);
+    }
     handleSwing({ span = Math.PI / 4, strength = 1, range = 5 }) {
         const cameraDir = this.camera.getWorldDirection(new THREE.Vector3());
         const yDir = Math.atan2(cameraDir.x, cameraDir.z);
@@ -220,7 +233,7 @@ class PlayerController {
                     // const angleDiff = yDir - theta;
                     if (Math.abs(angleDifference(theta, yDir)) < span || entityDist < 3) {
                         const away = this.controls.getObject().position.clone().sub(entity.box.getCenter(new THREE.Vector3())).normalize().multiplyScalar(-1.0);
-                        entity.takeDamage((10 + Math.random() * 10) * strength, new THREE.Vector3(away.x, 0, away.z));
+                        entity.takeDamage((this.weapon.damage + Math.random() * this.weapon.damage) * strength, new THREE.Vector3(away.x, 0, away.z));
                     }
                 }
             } else if (entity instanceof Projectile) {
@@ -242,10 +255,10 @@ class PlayerController {
         let doDent = false;
         if (this.weaponState === "idle") {
             if (keys["shift"]) {
-                this.weaponController.addTargetPosition(-0.3, 0.1, 0.0025, 0.2);
-                this.weaponController.addTargetPosition(0, 0, 0, 0.2);
-                this.weaponController.addTargetRotation(-0.5, -0.3, 0.3, 0.2);
-                this.weaponController.addTargetRotation(0, 0, 0, 0.2);
+                this.weaponController.addTargetPosition(-0.3, 0.1, 0.0025, 0.2 / this.weapon.speed);
+                this.weaponController.addTargetPosition(0, 0, 0, 0.2 / this.weapon.speed);
+                this.weaponController.addTargetRotation(-0.5, -0.3, 0.3, 0.2 / this.weapon.speed);
+                this.weaponController.addTargetRotation(0, 0, 0, 0.2 / this.weapon.speed);
                 this.handleSwing({ span: Math.PI / 4, strength: 1 })
                 this.weaponState = "attack";
                 this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
@@ -264,14 +277,14 @@ class PlayerController {
                     }
                 });
             } else if (input.button === 2) {
-                this.weaponController.addTargetPosition(-0.5, 0, 0, 0.2);
-                this.weaponController.addTargetRotation(-0.3, 1, 0.5, 0.2);
+                this.weaponController.addTargetPosition(-0.5, 0, 0, 0.2 / this.weapon.speed);
+                this.weaponController.addTargetRotation(-0.3, 1, 0.5, 0.2 / this.weapon.speed);
                 this.weaponState = "block";
             } else {
-                this.weaponController.addTargetPosition(-1.5, 0, 0, 0.35);
-                this.weaponController.addTargetPosition(0, 0, 0, 0.35);
-                this.weaponController.addTargetRotation(-0.9, 1, 0, 0.35);
-                this.weaponController.addTargetRotation(0, 0, 0, 0.35);
+                this.weaponController.addTargetPosition(-1.5, 0, 0, 0.35 / this.weapon.speed);
+                this.weaponController.addTargetPosition(0, 0, 0, 0.35 / this.weapon.speed);
+                this.weaponController.addTargetRotation(-0.9, 1, 0, 0.35 / this.weapon.speed);
+                this.weaponController.addTargetRotation(0, 0, 0, 0.35 / this.weapon.speed);
                 this.handleSwing({ span: Math.PI / 4, strength: 1.5, range: 7.5 });
                 this.weaponState = "slash";
                 doDent = true;

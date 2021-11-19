@@ -290,7 +290,7 @@ async function main() {
         heightMap,
         sourceMap,
         resetFunction,
-        number: 0,
+        number: 4,
         camera
     });
     entities = level.entities;

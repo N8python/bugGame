@@ -259,7 +259,7 @@ class PlayerController {
                 this.weaponController.addTargetPosition(0, 0, 0, 0.2 / this.weapon.speed);
                 this.weaponController.addTargetRotation(-0.5, -0.3, 0.3, 0.2 / this.weapon.speed);
                 this.weaponController.addTargetRotation(0, 0, 0, 0.2 / this.weapon.speed);
-                this.handleSwing({ span: Math.PI / 4, strength: 1 })
+                this.handleSwing({ span: Math.PI / 4, strength: 1, range: 10, strength: 0.75 })
                 this.weaponState = "attack";
                 this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
                 doDent = true;

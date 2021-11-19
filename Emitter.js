@@ -26,6 +26,7 @@ class Emitter extends THREE.Object3D {
         super();
         this.type = "Emitter";
         this.instancedMesh = new THREE.InstancedMesh(geometry, material, count);
+        this.instancedMesh.setColorAt(0, new THREE.Vector3(0, 0, 0));
         this.add(this.instancedMesh);
         this.count = count;
         this.particles = [];

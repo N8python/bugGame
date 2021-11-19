@@ -7,6 +7,7 @@ import Ant from "./Ant.js";
 import Bee from "./Bee.js";
 import Beetle from './Beetle.js';
 import Butterfly from './Butterfly.js';
+import Scorpion from './Scorpion.js';
 import {
     GLTFLoader
 } from './three/examples/jsm/loaders/GLTFLoader.js';
@@ -23,15 +24,15 @@ async function main() {
     const gltfLoader = new GLTFLoader();
     let { tileMap, sourceMap, heightMap } = LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
-    const skyTex = texLoader.load("assets/clouds.jpeg");
+    const skyTex = texLoader.load("assets/images/clouds.jpeg");
     skyTex.wrapS = THREE.RepeatWrapping;
     skyTex.wrapT = THREE.RepeatWrapping;
     skyTex.repeat.set(4, 4);
     const textures = {
-        wall: texLoader.load("assets/walltextures.png"),
-        envMap: texLoader.load("assets/oldfactory.jpeg"),
-        metalNormal: texLoader.load("assets/metalnormal.png"),
-        scratch: texLoader.load("assets/scratch.png")
+        wall: texLoader.load("assets/images/walltextures.png"),
+        envMap: texLoader.load("assets/images/oldfactory.jpeg"),
+        metalNormal: texLoader.load("assets/images/metalnormal.png"),
+        scratch: texLoader.load("assets/images/scratch.png")
     }
     textures.wall.anisotropy = 16;
     textures.envMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -139,15 +140,16 @@ async function main() {
         scene
     });
     const models = {
-        cobolt: await AssetManager.loadGLTFAsync("assets/cobolt.glb"),
-        pascaliber: await AssetManager.loadGLTFAsync("assets/pascaliber.glb"),
-        station: await AssetManager.loadGLTFAsync("assets/station.glb"),
-        lever: await AssetManager.loadGLTFAsync("assets/lever.glb"),
-        ant: await AssetManager.loadGLTFAsync("assets/ant.glb"),
-        beetle: await AssetManager.loadGLTFAsync("assets/beetle.glb"),
-        stinger: await AssetManager.loadGLTFAsync("assets/stinger.glb"),
-        butterfly: await AssetManager.loadGLTFAsync("assets/butterfly.glb"),
-        bee: await AssetManager.loadGLTFAsync("assets/bee.glb")
+        cobolt: await AssetManager.loadGLTFAsync("assets/models/cobolt.glb"),
+        pascaliber: await AssetManager.loadGLTFAsync("assets/models/pascaliber.glb"),
+        station: await AssetManager.loadGLTFAsync("assets/models/station.glb"),
+        lever: await AssetManager.loadGLTFAsync("assets/models/lever.glb"),
+        ant: await AssetManager.loadGLTFAsync("assets/models/ant.glb"),
+        beetle: await AssetManager.loadGLTFAsync("assets/models/beetle.glb"),
+        stinger: await AssetManager.loadGLTFAsync("assets/models/stinger.glb"),
+        butterfly: await AssetManager.loadGLTFAsync("assets/models/butterfly.glb"),
+        bee: await AssetManager.loadGLTFAsync("assets/models/bee.glb"),
+        scorpion: await AssetManager.loadGLTFAsync("assets/models/scorpion.glb")
     }
     const weapons = {
         cobolt: {

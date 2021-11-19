@@ -5,13 +5,15 @@ import Ant from "./Ant.js";
 import Bee from "./Bee.js";
 import Beetle from './Beetle.js';
 import Butterfly from './Butterfly.js';
+import Scorpion from "./Scorpion.js";
 import Station from './Station.js';
 import Lever from "./Lever.js";
 const enemyAmts = [
-    [15, 0, 0, 0],
-    [12, 5, 0, 0],
-    [8, 5, 8, 0],
-    [6, 8, 3, 10]
+    [15, 0, 0, 0, 0],
+    [12, 5, 0, 0, 0],
+    [8, 5, 8, 0, 0],
+    [6, 8, 3, 10, 0],
+    [6, 6, 3, 8, 5]
 ]
 let levelDefault = [10, 8, 6, 8];
 class Level {
@@ -130,6 +132,29 @@ class Level {
                     entities,
                     playerController,
                     projectileMesh: models.stinger.scene.children[0],
+                    direction: 2 * Math.PI * Math.random()
+                });
+            },
+            isOpen
+        });
+        EnemyManager.placeEnemies(this.enemyCounts[4], {
+            tileMap,
+            sourceMap,
+            heightMap,
+            entities,
+            scene,
+            avoid,
+            create(chosenSpot) {
+                return new Scorpion(models.scorpion.scene, models.scorpion.animations, {
+                    position: new THREE.Vector3(chosenSpot.x * 5, 0, chosenSpot.y * 5),
+                    scene,
+                    tileMap,
+                    heightMap,
+                    sourceMap,
+                    entities,
+                    playerController,
+                    projectileMesh: models.stinger.scene.children[0],
+                    camera,
                     direction: 2 * Math.PI * Math.random()
                 });
             },

@@ -32,15 +32,14 @@ async function main() {
     skyTex.repeat.set(4, 4);
     const textures = {
         wall: texLoader.load("assets/images/walltextures.png"),
-        wallNormal: texLoader.load("assets/images/wallnormal.png"),
-        envMap: texLoader.load("assets/images/oldfactory.jpeg"),
+        envMap: texLoader.load("assets/images/oldfactory.png"),
         metalNormal: texLoader.load("assets/images/metalnormal.png"),
         scratch: texLoader.load("assets/images/scratch.png")
     }
     textures.wall.anisotropy = 16;
-    textures.wall.wallNormal = 16;
     textures.envMap.mapping = THREE.EquirectangularReflectionMapping;
     textures.envMap.encoding = THREE.sRGBEncoding;
+    textures.scratch.anisotropy = 16;
     const decalMaterial = new THREE.MeshBasicMaterial({
         map: textures.scratch,
         alphaMap: textures.scratch,
@@ -121,7 +120,6 @@ async function main() {
     let levelMaterial = new THREE.MeshStandardMaterial({
         color: new THREE.Color(0.15, 0.15, 0.15),
         map: textures.wall,
-        normalMap: textures.wallNormal,
         envMap: textures.envMap,
         metalness: 0.5,
         roughness: 0.75,
@@ -271,7 +269,6 @@ async function main() {
         levelMaterial = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0.15, 0.15, 0.15),
             map: textures.wall,
-            normalMap: textures.wallNormal,
             envMap: textures.envMap,
             metalness: 0.5,
             roughness: 0.75,

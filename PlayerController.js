@@ -1,9 +1,10 @@
-import * as THREE from './three/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
 import WeaponController from './WeaponController.js';
 import Lever from './Lever.js';
 import Projectile from './Projectile.js';
 import Station from './Station.js';
-import { DecalGeometry } from "./three/examples/jsm/geometries/DecalGeometry.js";
+import { DecalGeometry } from "https://cdn.skypack.dev/three@0.133.0/examples/jsm/geometries/DecalGeometry.js";
+import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/controls/PointerLockControls.js';
 
 function angleDifference(angle1, angle2) {
     const diff = ((angle2 - angle1 + Math.PI) % (Math.PI * 2)) - Math.PI;
@@ -44,6 +45,8 @@ class PlayerController {
         this.dentMaterial = dentMap;
         this.levelMesh = levelMesh;
         this.decals = decals;
+        this.trueHeight = height;
+        this.camera.lookAt(0, 0, 0);
     }
     getPosition() {
         return this.controls.getObject().position;
@@ -65,27 +68,58 @@ class PlayerController {
         this.health = Math.max(this.health, 0);
         this.healthLoss += oldHealth - this.health;
     }
+    revive() {
+        this.health = this.maxHealth;
+        this.height = this.trueHeight;
+        this.position.y = this.height;
+        this.dead = false;
+        this.deathTick = undefined;
+        this.camera.rotation.z = this.oldRotation - 1.57;
+        this.camera.lookAt(0, 0, 0);
+        document.getElementById("death").style.display = "none";
+    }
     update(keys, mouseDown) {
         this.health = Math.max(this.health, 0);
         this.healthLoss *= 0.9;
+        if (this.health === 0) {
+            this.dead = true;
+            document.getElementById("death").style.display = "block";
+            this.oldRotation = this.camera.rotation.z;
+        }
+        if (this.dead) {
+            this.velocity.multiplyScalar(0);
+            this.controls.enabled = false;
+            this.controls.isLocked = false;
+            if (this.deathTick === undefined) {
+                this.deathTick = 0;
+            } else {
+                this.deathTick++;
+            }
+            if (this.deathTick < 30) {
+                this.camera.rotation.z += 1.57 / 30;
+                this.height *= 0.9;
+            }
+        }
         const playerPos2D = new THREE.Vector2(this.controls.getObject().position.x, this.controls.getObject().position.z);
         const tile = new THREE.Vector2(Math.floor(playerPos2D.x / 5) + 50, Math.floor(playerPos2D.y / 5) + 50);
         const cameraDir = this.camera.getWorldDirection(new THREE.Vector3());
         const yDir = Math.atan2(cameraDir.x, cameraDir.z);
         const xzVel = new THREE.Vector2();
-        if (keys["w"]) {
-            xzVel.x += Math.sin(yDir);
-            xzVel.y += Math.cos(yDir);
-        } else if (keys["s"]) {
-            xzVel.x -= Math.sin(yDir);
-            xzVel.y -= Math.cos(yDir);
-        }
-        if (keys["a"]) {
-            xzVel.x += Math.sin(yDir + Math.PI / 2);
-            xzVel.y += Math.cos(yDir + Math.PI / 2);
-        } else if (keys["d"]) {
-            xzVel.x -= Math.sin(yDir + Math.PI / 2);
-            xzVel.y -= Math.cos(yDir + Math.PI / 2);
+        if (!this.dead) {
+            if (keys["w"]) {
+                xzVel.x += Math.sin(yDir);
+                xzVel.y += Math.cos(yDir);
+            } else if (keys["s"]) {
+                xzVel.x -= Math.sin(yDir);
+                xzVel.y -= Math.cos(yDir);
+            }
+            if (keys["a"]) {
+                xzVel.x += Math.sin(yDir + Math.PI / 2);
+                xzVel.y += Math.cos(yDir + Math.PI / 2);
+            } else if (keys["d"]) {
+                xzVel.x -= Math.sin(yDir + Math.PI / 2);
+                xzVel.y -= Math.cos(yDir + Math.PI / 2);
+            }
         }
         xzVel.normalize();
         xzVel.multiplyScalar(0.025);
@@ -101,7 +135,7 @@ class PlayerController {
             this.position.y = this.height;
         }
         if (this.position.y <= this.height + 0.25) {
-            if (keys[" "]) {
+            if (keys[" "] && !this.dead) {
                 this.velocity.y += 1.75;
                 this.onGround = false;
             }
@@ -252,6 +286,9 @@ class PlayerController {
         })
     }
     registerClick(input, keys) {
+        if (this.dead) {
+            return;
+        }
         let doDent = false;
         if (this.weaponState === "idle") {
             if (keys["shift"]) {
@@ -266,6 +303,10 @@ class PlayerController {
                 this.entities.forEach(entity => {
                     if (entity instanceof Lever) {
                         if (this.raycaster.ray.intersectsBox(entity.box.clone().expandByScalar(1.5))) {
+                            if (entity.number === 5 && !entity.pushed) {
+                                this.health += 75;
+                                this.health = Math.min(this.health, this.maxHealth);
+                            }
                             entity.push();
                             doDent = false;
                         }

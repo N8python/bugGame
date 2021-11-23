@@ -1,6 +1,6 @@
-import * as THREE from './three/build/three.module.js';
-import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
-import { PointerLockControls } from './three/examples/jsm/controls/PointerLockControls.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/controls/OrbitControls.js';
+import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/controls/PointerLockControls.js';
 import PlayerController from './PlayerController.js';
 import Projectile from "./Projectile.js";
 import Ant from "./Ant.js";
@@ -8,9 +8,10 @@ import Bee from "./Bee.js";
 import Beetle from './Beetle.js';
 import Butterfly from './Butterfly.js';
 import Scorpion from './Scorpion.js';
+import Queen from "./Queen.js";
 import {
     GLTFLoader
-} from './three/examples/jsm/loaders/GLTFLoader.js';
+} from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/loaders/GLTFLoader.js';
 import Delaunator from 'https://cdn.skypack.dev/delaunator@5.0.0';
 import Stats from "./stats.js";
 import jsgraphs from './jsgraphs.js';
@@ -22,7 +23,8 @@ import { EnemyManager } from "./EnemyManager.js";
 import Level from "./Level.js";
 async function main() {
     const gltfLoader = new GLTFLoader();
-    let { tileMap, sourceMap, heightMap } = LevelGenerator.generateMaps();
+    let startLevel = 4;
+    let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
     const skyTex = texLoader.load("assets/images/clouds.jpeg");
     skyTex.wrapS = THREE.RepeatWrapping;
@@ -30,11 +32,13 @@ async function main() {
     skyTex.repeat.set(4, 4);
     const textures = {
         wall: texLoader.load("assets/images/walltextures.png"),
+        wallNormal: texLoader.load("assets/images/wallnormal.png"),
         envMap: texLoader.load("assets/images/oldfactory.jpeg"),
         metalNormal: texLoader.load("assets/images/metalnormal.png"),
         scratch: texLoader.load("assets/images/scratch.png")
     }
     textures.wall.anisotropy = 16;
+    textures.wall.wallNormal = 16;
     textures.envMap.mapping = THREE.EquirectangularReflectionMapping;
     textures.envMap.encoding = THREE.sRGBEncoding;
     const decalMaterial = new THREE.MeshBasicMaterial({
@@ -117,6 +121,7 @@ async function main() {
     let levelMaterial = new THREE.MeshStandardMaterial({
         color: new THREE.Color(0.15, 0.15, 0.15),
         map: textures.wall,
+        normalMap: textures.wallNormal,
         envMap: textures.envMap,
         metalness: 0.5,
         roughness: 0.75,
@@ -149,7 +154,23 @@ async function main() {
         stinger: await AssetManager.loadGLTFAsync("assets/models/stinger.glb"),
         butterfly: await AssetManager.loadGLTFAsync("assets/models/butterfly.glb"),
         bee: await AssetManager.loadGLTFAsync("assets/models/bee.glb"),
-        scorpion: await AssetManager.loadGLTFAsync("assets/models/scorpion.glb")
+        scorpion: await AssetManager.loadGLTFAsync("assets/models/scorpion.glb"),
+        queen: await AssetManager.loadGLTFAsync("assets/models/queen.glb")
+    }
+    const bossAnimArrs = (await Promise.all([
+        AssetManager.loadGLTFAsync("assets/models/anims/queenwalk.glb"),
+        AssetManager.loadGLTFAsync("assets/models/anims/queenfly.glb"),
+        AssetManager.loadGLTFAsync("assets/models/anims/queenpunch.glb"),
+        AssetManager.loadGLTFAsync("assets/models/anims/queenblock.glb"),
+        AssetManager.loadGLTFAsync("assets/models/anims/queensummon.glb")
+    ])).map(obj => obj.animations);
+
+    const bossAnims = {
+        "walk": bossAnimArrs[0],
+        "fly": bossAnimArrs[1],
+        "punch": bossAnimArrs[2],
+        "block": bossAnimArrs[3],
+        "summon": bossAnimArrs[4],
     }
     const weapons = {
         cobolt: {
@@ -220,7 +241,12 @@ async function main() {
             child.material.envMap = textures.envMap;
         }
     });
-    const resetFunction = () => {
+    models.queen.scene.traverse((child) => {
+        if (child.isMesh) {
+            child.material.envMap = textures.envMap;
+        }
+    })
+    const resetFunction = (stayOnLevel) => {
         scene.remove(levelMesh);
         entities.forEach(entity => {
             scene.remove(entity.mesh);
@@ -237,7 +263,7 @@ async function main() {
             scene.remove(decal);
         });
         decals = [];
-        const maps = LevelGenerator.generateMaps();
+        const maps = (stayOnLevel ? level.number === 5 : level.number + 1 === 5) ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
         tileMap = maps.tileMap;
         heightMap = maps.heightMap;
         sourceMap = maps.sourceMap;
@@ -245,6 +271,7 @@ async function main() {
         levelMaterial = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0.15, 0.15, 0.15),
             map: textures.wall,
+            normalMap: textures.wallNormal,
             envMap: textures.envMap,
             metalness: 0.5,
             roughness: 0.75,
@@ -271,8 +298,9 @@ async function main() {
             tileMap,
             heightMap,
             sourceMap,
+            bossAnims,
             resetFunction,
-            number: level.number + 1,
+            number: level.number + +!stayOnLevel,
             camera
         });
         entities = level.entities;
@@ -282,6 +310,10 @@ async function main() {
         playerController.heightMap = heightMap;
         playerController.levelMesh = levelMesh;
         playerController.health = playerController.maxHealth;
+        if (playerController.dead) {
+            playerController.revive();
+        }
+        playerController.camera.lookAt(0, 0, 0);
     };
     let level = new Level(models, scene, {
         playerController,
@@ -290,7 +322,8 @@ async function main() {
         heightMap,
         sourceMap,
         resetFunction,
-        number: 4,
+        bossAnims,
+        number: startLevel,
         camera
     });
     entities = level.entities;
@@ -298,6 +331,9 @@ async function main() {
     const healthBackground = document.getElementById("healthBackground");
     const healthBar = document.getElementById("healthBar");
     const healthLoss = document.getElementById("healthLoss");
+    const enemyBackground = document.getElementById("enemyBackground");
+    const enemyBar = document.getElementById("enemyBar");
+    const enemyLoss = document.getElementById("enemyLoss");
     let lastUpdate = performance.now();
     const stats = new Stats();
     stats.showPanel(0);
@@ -327,9 +363,26 @@ async function main() {
         healthLoss.style.width = `${Math.round((playerController.healthLoss / playerController.maxHealth) * 192)}px`;
         const marginOffset = Math.round((playerController.health / playerController.maxHealth) * 192) + 4 + Math.round(0.0125 * window.innerWidth);
         healthLoss.style.left = `${marginOffset}px`;
+        const enemy = entities.find(e => e instanceof Queen);
+        if (enemy) {
+            enemyBar.style.width = `${Math.round((enemy.memory.health / enemy.memory.maxHealth) * 192)}px`;
+            enemyLoss.style.width = `${Math.round((enemy.memory.healthLoss / enemy.memory.maxHealth) * 192)}px`;
+            const marginOffset = Math.round((enemy.memory.health / enemy.memory.maxHealth) * 192) + 4 + Math.round(0.0125 * window.innerWidth);
+            enemyLoss.style.left = `${marginOffset}px`;
+            // healthLoss.style.width = `${Math.round((enemy.healthLoss / enemy.maxHealth) * 192)}px`;
+        }
         if (decals.length > 100) {
             const first = decals.shift();
             scene.remove(first)
+        }
+        if (level.number !== 5) {
+            enemyBar.style.display = "none";
+            enemyLoss.style.display = "none";
+            enemyBackground.style.display = "none";
+        } else {
+            enemyBar.style.display = "block";
+            enemyLoss.style.display = "block";
+            enemyBackground.style.display = "block";
         }
         requestAnimationFrame(animate);
     }
@@ -354,6 +407,9 @@ async function main() {
     }
     document.onkeyup = (e) => {
         keys[e.key.toLowerCase()] = false;
+    }
+    document.getElementById("restart").onclick = () => {
+        resetFunction(true);
     }
 }
 

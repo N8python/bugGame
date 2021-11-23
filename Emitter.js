@@ -1,4 +1,4 @@
-import * as THREE from './three/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
 /* Particle Structure {
     position: Vector3,
     rotation: Vector3,

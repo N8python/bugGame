@@ -6,13 +6,54 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bug Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        #crosshair::selection {
+            color: none;
+            background: none;
+        }
+        
+        h1::selection {
+            color: none;
+            background: none;
+        }
+        
+        h1 {
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        button {
+            font-family: 'Roboto Mono', monospace;
+            background-color: rgb(175, 175, 175);
+            transition: 250ms;
+        }
+        
+        button:hover {
+            background-color: rgb(200, 200, 200);
+        }
+        
+        button:active {
+            background-color: rgb(150, 150, 150);
+        }
+    </style>
 </head>
 
 <body>
     <div style="background-color:black;width:200px;height:33px;position:absolute;left: 1.25%;top: 2.5%;" id="healthBackground"></div>
     <div style="background-color:lime;width:192px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 4px);" id="healthBar"></div>
     <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 4px);" id="healthLoss"></div>
+    <div style="background-color:black;width:200px;height:33px;position:absolute;left: 1.25%;top: calc(2.5% + 37px);" id="enemyBackground"></div>
+    <div style="background-color:red;width:192px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);" id="enemyBar"></div>
+    <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);" id="enemyLoss"></div>
     <img id="crosshair" style="position: absolute; top:50%;left:50%;transform:translate(-50%, -50%);z-index:5;width:16px;height:16px;opacity: 0.75;" src="assets/images/crosshair.png"></img>
+    <div id="death" style="display:none">
+        <h1 style="position: absolute; top:50%;left:50%;transform:translate(-50%, -200%);z-index:5;font-size:120px;color:white;">You died!</h1>
+        <button style="position: absolute; top:50%;left:50%;transform:translate(-50%, 150%);z-index:5;font-size:30px;color:white;" id="restart">Restart Level</button>
+    </div>
+
     <!--<canvas id="canvas" width="700px" height="700px"></canvas>-->
     <script type="module" src="main.js"></script>
 </body>

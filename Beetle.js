@@ -1,4 +1,4 @@
-import * as THREE from './three/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
 import Emitter from './Emitter.js';
 
 function angleDifference(angle1, angle2) {
@@ -6,7 +6,7 @@ function angleDifference(angle1, angle2) {
     return (diff < -Math.PI) ? diff + (Math.PI * 2) : diff;
 }
 const texLoader = new THREE.TextureLoader();
-const smokeTex = texLoader.load("assets/smoke.jpeg");
+const smokeTex = texLoader.load("assets/images/smoke.jpeg");
 class Beetle {
     constructor(model, animations, {
         position,

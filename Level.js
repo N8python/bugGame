@@ -1,4 +1,4 @@
-import * as THREE from './three/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
 import { LevelGenerator } from "./LevelGenerator.js";
 import { EnemyManager } from "./EnemyManager.js";
 import Ant from "./Ant.js";
@@ -6,6 +6,7 @@ import Bee from "./Bee.js";
 import Beetle from './Beetle.js';
 import Butterfly from './Butterfly.js';
 import Scorpion from "./Scorpion.js";
+import Queen from "./Queen.js";
 import Station from './Station.js';
 import Lever from "./Lever.js";
 const enemyAmts = [
@@ -13,9 +14,10 @@ const enemyAmts = [
     [12, 5, 0, 0, 0],
     [8, 5, 8, 0, 0],
     [6, 8, 3, 10, 0],
-    [6, 6, 3, 8, 5]
+    [6, 4, 3, 6, 3],
+    [0, 0, 0, 0, 0]
 ]
-let levelDefault = [10, 8, 6, 8];
+let levelDefault = [10, 8, 6, 8, 2];
 class Level {
     constructor(models, scene, {
         playerController,
@@ -25,6 +27,7 @@ class Level {
         heightMap,
         resetFunction,
         camera,
+        bossAnims,
         number = 0
     }) {
         this.models = models;
@@ -33,6 +36,7 @@ class Level {
         this.camera = camera;
         this.tileMap = tileMap;
         this.number = number;
+        this.bossAnims = bossAnims;
         levelDefault[0] = 7 + Math.floor(7 * Math.random());
         levelDefault[1] = 7 + Math.floor(7 * Math.random());
         levelDefault[2] = 7 + Math.floor(7 * Math.random());
@@ -160,6 +164,23 @@ class Level {
             },
             isOpen
         });
+        if (number === 5) {
+            const boss = new Queen(models.queen.scene, bossAnims, {
+                position: new THREE.Vector3(0, 0, 0),
+                scene,
+                direction: 0,
+                tileMap,
+                sourceMap,
+                heightMap,
+                entities,
+                playerController,
+                models,
+                projectileMesh: models.stinger.scene.children[0],
+                camera
+            });
+            scene.add(boss.mesh);
+            entities.push(boss);
+        }
         let placeX;
         let placeY; {
             const playerX = Math.floor(camera.position.x / 5 + 50);
@@ -213,7 +234,8 @@ class Level {
                     position: new THREE.Vector3(chosenSpot.x * 5, 0, chosenSpot.y * 5),
                     camera,
                     scene,
-                    entities
+                    entities,
+                    number
                 })
             },
             isOpen

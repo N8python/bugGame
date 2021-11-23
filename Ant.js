@@ -1,5 +1,5 @@
-import * as THREE from './three/build/three.module.js';
-import * as SkeletonUtils from "./three/examples/jsm/utils/SkeletonUtils.js";
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
+import * as SkeletonUtils from "https://cdn.skypack.dev/three@0.133.0/examples/jsm/utils/SkeletonUtils.js";
 
 function angleDifference(angle1, angle2) {
     const diff = ((angle2 - angle1 + Math.PI) % (Math.PI * 2)) - Math.PI;

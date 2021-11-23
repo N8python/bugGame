@@ -1,4 +1,4 @@
-import * as THREE from './three/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
 import Emitter from "./Emitter.js";
 const texLoader = new THREE.TextureLoader();
 const smokeTex = texLoader.load("assets/images/smoke.jpeg");

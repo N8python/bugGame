@@ -1,11 +1,12 @@
-import * as THREE from './three/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.133.0';
 import Station from './Station.js';
 class Lever {
     constructor(mesh, animations, {
         position,
         camera,
         entities,
-        scene
+        scene,
+        number
     }) {
         this.mesh = mesh.clone();
         this.mesh.position.copy(position);
@@ -35,6 +36,7 @@ class Lever {
         //this.scene.add(helper);
         this.updateBox();
         this.entities = entities;
+        this.number = number;
     }
     update(delta, frustum) {
         this.mixer.update(delta);

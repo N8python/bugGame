@@ -5,6 +5,7 @@ import Projectile from './Projectile.js';
 import Station from './Station.js';
 import { DecalGeometry } from "https://cdn.skypack.dev/three@0.133.0/examples/jsm/geometries/DecalGeometry.js";
 import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/controls/PointerLockControls.js';
+import TextManager from './TextManager.js';
 
 function angleDifference(angle1, angle2) {
     const diff = ((angle2 - angle1 + Math.PI) % (Math.PI * 2)) - Math.PI;
@@ -79,6 +80,10 @@ class PlayerController {
         document.getElementById("death").style.display = "none";
     }
     update(keys, mouseDown) {
+        if (TextManager.displaying) {
+            this.controls.isLocked = false;
+            document.exitPointerLock();
+        }
         this.health = Math.max(this.health, 0);
         this.healthLoss *= 0.9;
         if (this.health === 0) {
@@ -105,7 +110,7 @@ class PlayerController {
         const cameraDir = this.camera.getWorldDirection(new THREE.Vector3());
         const yDir = Math.atan2(cameraDir.x, cameraDir.z);
         const xzVel = new THREE.Vector2();
-        if (!this.dead) {
+        if (!this.dead && !TextManager.displaying) {
             if (keys["w"]) {
                 xzVel.x += Math.sin(yDir);
                 xzVel.y += Math.cos(yDir);

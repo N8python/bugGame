@@ -21,9 +21,22 @@ import { AssetManager } from './AssetManagement.js';
 import { LevelGenerator } from "./LevelGenerator.js";
 import { EnemyManager } from "./EnemyManager.js";
 import Level from "./Level.js";
+import TextManager from "./TextManager.js";
 async function main() {
-    const gltfLoader = new GLTFLoader();
-    let startLevel = 4;
+    TextManager.element = document.getElementById("textContainer");
+    TextManager.backgroundElement = document.getElementById("transmissionBackground");
+    async function displayText(level) {
+        if (level === 0) {
+            await TextManager.displayMessage("Introduction");
+            await TextManager.displayMessage("Tutorial");
+        } else if (level === 3) {
+            await TextManager.displayMessage("Pascaliber");
+        } else if (level === 5) {
+            await TextManager.displayMessage("Boss");
+        }
+    }
+    let startLevel = 0;
+    displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
     const skyTex = texLoader.load("assets/images/clouds.jpeg");
@@ -302,6 +315,7 @@ async function main() {
         });
         entities = level.entities;
         playerController.entities = entities;
+        playerController.decals = decals;
         playerController.tileMap = tileMap;
         playerController.sourceMap = sourceMap;
         playerController.heightMap = heightMap;
@@ -311,6 +325,9 @@ async function main() {
             playerController.revive();
         }
         playerController.camera.lookAt(0, 0, 0);
+        if (!stayOnLevel) {
+            displayText(level.number);
+        }
     };
     let level = new Level(models, scene, {
         playerController,
@@ -352,9 +369,11 @@ async function main() {
         }
         const frustum = new THREE.Frustum();
         frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-        entities.forEach(entity => {
-            entity.update(delta, frustum);
-        });
+        if (!TextManager.displaying) {
+            entities.forEach(entity => {
+                entity.update(delta, frustum);
+            });
+        }
         stats.update();
         healthBar.style.width = `${Math.round((playerController.health / playerController.maxHealth) * 192)}px`;
         healthLoss.style.width = `${Math.round((playerController.healthLoss / playerController.maxHealth) * 192)}px`;
@@ -406,8 +425,23 @@ async function main() {
         keys[e.key.toLowerCase()] = false;
     }
     document.getElementById("restart").onclick = () => {
-        resetFunction(true);
-    }
+            resetFunction(true);
+        }
+        /*TextManager.typeOut(document.getElementById("textContainer"),
+            `Dear AGENT REPPOH,
+
+        Armies of insects have invaded the KRAM II’s systems. The survival of the KRAM II, our most powerful computer, is vital to our university. You, AGENT, have been tasked with expunging this insect scourge, and restoring all switches and machinery that these foul beasts have disabled. We have provided you with a powerful weapon: The COBOLT. Use it well. We wish you the best of luck.
+
+        KILL ALL INSECTS.
+
+        FLIP ALL LEVERS.
+
+        CLEANSE ALL TUBES.
+
+        Sincerely,
+        DRAVRAH UNIVERSITY
+
+        `);*/
 }
 
 main();

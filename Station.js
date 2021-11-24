@@ -60,7 +60,7 @@ class Station {
         this.entities = entities;
         this.blockPlayer = true;
         this.pushed = false;
-        this.finalButton.material = this.greenMaterial;
+        //this.finalButton.material = this.greenMaterial;
     }
     update(delta, frustum) {
         const eLength = this.entities.filter(x => (x instanceof Ant || x instanceof Bee || x instanceof Beetle || x instanceof Butterfly || x instanceof Scorpion || x instanceof Queen) && !x.dying).length;

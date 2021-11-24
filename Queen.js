@@ -6,6 +6,7 @@ import Scorpion from './Scorpion.js';
 import Beetle from './Beetle.js';
 import Butterfly from './Butterfly.js';
 import Bee from './Bee.js';
+import TextManager from "./TextManager.js";
 
 function angleDifference(angle1, angle2) {
     const diff = ((angle2 - angle1 + Math.PI) % (Math.PI * 2)) - Math.PI;
@@ -28,7 +29,7 @@ class Queen {
         models
     }) {
         this.mesh = model.clone();
-        this.mesh.scale.set(2, 2, 2);
+        this.mesh.scale.set(0, 0, 0);
         this.mesh.position.copy(position);
         this.height = 11;
         this.direction = direction;
@@ -148,6 +149,11 @@ class Queen {
                 new THREE.Vector3(Math.random() * 0.25 - 0.125 + startingVelocity.x, -0.05 + Math.random() * 0.25 + startingVelocity.y, Math.random() * 0.25 - 0.125 + startingVelocity.z),
                 new THREE.Vector3(Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1)
             ]);
+        });
+        this.entities.forEach(entity => {
+            if (entity instanceof Ant || entity instanceof Bee || entity instanceof Beetle || entity instanceof Butterfly || entity instanceof Scorpion) {
+                entity.die();
+            }
         });
         //this.scene.remove(this.smokeEmitter);
     }
@@ -655,6 +661,12 @@ class Queen {
             this.deadParts.splice(i, 1);
             this.deadVelocities.splice(i, 1);
         });
+        if (this.dying && this.deadParts.length === 0) {
+            if (!this.hadVictory) {
+                this.hadVictory = true;
+                TextManager.displayMessage("Victory");
+            }
+        }
         if (!this.dying) {
             if (this.mesh.position.distanceTo(this.playerController.getPosition()) < 100 && (this.state.type === "idle")) {
                 this.state = {

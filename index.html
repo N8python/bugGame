@@ -66,7 +66,7 @@
     <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);" id="enemyLoss"></div>
     <img id="crosshair" style="position: absolute; top:50%;left:50%;transform:translate(-50%, -50%);z-index:5;width:16px;height:16px;opacity: 0.75;" src="assets/images/crosshair.png"></img>
     <div id="death" style="display:none">
-        <h1 style="position: absolute; top:50%;left:50%;transform:translate(-50%, -200%);z-index:5;font-size:120px;color:white;">You died!</h1>
+        <h1 style="position: absolute; top:50%;left:50%;transform:translate(-50%, -200%);z-index:5;font-size:120px;color:white;">You&nbsp;died!</h1>
         <button style="position: absolute; top:50%;left:50%;transform:translate(-50%, 150%);z-index:5;font-size:30px;color:white;" id="restart">Restart Level</button>
     </div>
     <div id="transmission">
@@ -79,7 +79,8 @@
             </div>
         </div>
     </div>
-
+    <img id="coverScreen" src="assets/images/titlescreen.png" style="z-index:30;width:99%;overflow:hidden;position:absolute;max-height:98%;">
+    <h1 id="load" style="position: absolute; top:50%;left:50%;transform:translate(-50%, 125%);z-index:40;font-size:60px;color:white;">Loading...</h1>
     <!--<canvas id="canvas" width="700px" height="700px"></canvas>-->
     <script type="module" src="main.js"></script>
 </body>

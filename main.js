@@ -25,6 +25,7 @@ import TextManager from "./TextManager.js";
 async function main() {
     TextManager.element = document.getElementById("textContainer");
     TextManager.backgroundElement = document.getElementById("transmissionBackground");
+    const load = document.getElementById("load");
     async function displayText(level) {
         if (level === 0) {
             await TextManager.displayMessage("Introduction");
@@ -35,6 +36,7 @@ async function main() {
             await TextManager.displayMessage("Boss");
         }
     }
+    load.innerHTML = "Loading&nbsp;Level...";
     let startLevel = 0;
     displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
@@ -155,6 +157,7 @@ async function main() {
         decals,
         scene
     });
+    load.innerHTML = "Loading&nbsp;Models...";
     const models = {
         cobolt: await AssetManager.loadGLTFAsync("assets/models/cobolt.glb"),
         pascaliber: await AssetManager.loadGLTFAsync("assets/models/pascaliber.glb"),
@@ -168,6 +171,7 @@ async function main() {
         scorpion: await AssetManager.loadGLTFAsync("assets/models/scorpion.glb"),
         queen: await AssetManager.loadGLTFAsync("assets/models/queen.glb")
     }
+    load.innerHTML = "Loading&nbsp;Animations...";
     const bossAnimArrs = (await Promise.all([
         AssetManager.loadGLTFAsync("assets/models/anims/queenwalk.glb"),
         AssetManager.loadGLTFAsync("assets/models/anims/queenfly.glb"),
@@ -355,6 +359,11 @@ async function main() {
     stats.dom.style.left = "calc(100% - 86px)";
     stats.dom.style.top = "8px";
     document.body.appendChild(stats.dom);
+    document.getElementById("coverScreen").style.display = "none";
+    load.innerHTML = "Loaded!";
+    setTimeout(() => {
+        load.innerHTML = "";
+    }, 100);
 
     function animate() {
         const delta = (performance.now() - lastUpdate) * 0.001;

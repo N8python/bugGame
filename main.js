@@ -37,7 +37,7 @@ async function main() {
         }
     }
     load.innerHTML = "Loading&nbsp;Level...";
-    let startLevel = 0;
+    let startLevel = 5;
     displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
@@ -158,19 +158,46 @@ async function main() {
         scene
     });
     load.innerHTML = "Loading&nbsp;Models...";
-    const models = {
-        cobolt: await AssetManager.loadGLTFAsync("assets/models/cobolt.glb"),
-        pascaliber: await AssetManager.loadGLTFAsync("assets/models/pascaliber.glb"),
-        station: await AssetManager.loadGLTFAsync("assets/models/station.glb"),
-        lever: await AssetManager.loadGLTFAsync("assets/models/lever.glb"),
-        ant: await AssetManager.loadGLTFAsync("assets/models/ant.glb"),
-        beetle: await AssetManager.loadGLTFAsync("assets/models/beetle.glb"),
-        stinger: await AssetManager.loadGLTFAsync("assets/models/stinger.glb"),
-        butterfly: await AssetManager.loadGLTFAsync("assets/models/butterfly.glb"),
-        bee: await AssetManager.loadGLTFAsync("assets/models/bee.glb"),
-        scorpion: await AssetManager.loadGLTFAsync("assets/models/scorpion.glb"),
-        queen: await AssetManager.loadGLTFAsync("assets/models/queen.glb")
-    }
+    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
+    const models =
+        /*{
+               cobolt: await AssetManager.loadGLTFAsync("assets/models/cobolt.glb"),
+               pascaliber: await AssetManager.loadGLTFAsync("assets/models/pascaliber.glb"),
+               station: await AssetManager.loadGLTFAsync("assets/models/station.glb"),
+               lever: await AssetManager.loadGLTFAsync("assets/models/lever.glb"),
+               ant: await AssetManager.loadGLTFAsync("assets/models/ant.glb"),
+               beetle: await AssetManager.loadGLTFAsync("assets/models/beetle.glb"),
+               stinger: await AssetManager.loadGLTFAsync("assets/models/stinger.glb"),
+               butterfly: await AssetManager.loadGLTFAsync("assets/models/butterfly.glb"),
+               bee: await AssetManager.loadGLTFAsync("assets/models/bee.glb"),
+               scorpion: await AssetManager.loadGLTFAsync("assets/models/scorpion.glb"),
+               queen: await AssetManager.loadGLTFAsync("assets/models/queen.glb")
+           }*/
+        Object.fromEntries(zip([
+            "cobolt",
+            "pascaliber",
+            "station",
+            "lever",
+            "ant",
+            "beetle",
+            "stinger",
+            "butterfly",
+            "bee",
+            "scorpion",
+            "queen"
+        ], await Promise.all([
+            AssetManager.loadGLTFAsync("assets/models/cobolt.glb"),
+            AssetManager.loadGLTFAsync("assets/models/pascaliber.glb"),
+            AssetManager.loadGLTFAsync("assets/models/station.glb"),
+            AssetManager.loadGLTFAsync("assets/models/lever.glb"),
+            AssetManager.loadGLTFAsync("assets/models/ant.glb"),
+            AssetManager.loadGLTFAsync("assets/models/beetle.glb"),
+            AssetManager.loadGLTFAsync("assets/models/stinger.glb"),
+            AssetManager.loadGLTFAsync("assets/models/butterfly.glb"),
+            AssetManager.loadGLTFAsync("assets/models/bee.glb"),
+            AssetManager.loadGLTFAsync("assets/models/scorpion.glb"),
+            AssetManager.loadGLTFAsync("assets/models/queen.glb")
+        ])));
     load.innerHTML = "Loading&nbsp;Animations...";
     const bossAnimArrs = (await Promise.all([
         AssetManager.loadGLTFAsync("assets/models/anims/queenwalk.glb"),

@@ -36,8 +36,8 @@ async function main() {
             await TextManager.displayMessage("Boss");
         }
     }
-    load.innerHTML = "Loading&nbsp;Sounds...";
-    let startLevel = 0;
+    load.innerHTML = "Loading&nbsp;Levels...";
+    let startLevel = 5;
     displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
@@ -79,7 +79,7 @@ async function main() {
     backgroundMusic.setBuffer(await AssetManager.loadAudioAsync("assets/sounds/music/backgroundMusic.mp3"));
     backgroundMusic.setLoop(true);
     backgroundMusic.setVolume(0.5);
-    const sfxArray = await Promise.all([
+    const sfxArray = await AssetManager.loadAll([
         AssetManager.loadAudioAsync("assets/sounds/sfx/slash-hit.ogg"),
         AssetManager.loadAudioAsync("assets/sounds/sfx/swish.wav"), // kwahmah_02
         AssetManager.loadAudioAsync("assets/sounds/sfx/slash-wood.wav"), // "Dropping, Wood, C.wav", InspectorJ
@@ -93,7 +93,7 @@ async function main() {
         AssetManager.loadAudioAsync("assets/sounds/sfx/bee.wav"),
         AssetManager.loadAudioAsync("assets/sounds/sfx/flap.wav")
 
-    ]);
+    ], load, "Loading&nbsp;Sounds");
     const sfxKeys = [
         "slashHit",
         "swish",
@@ -208,7 +208,6 @@ async function main() {
         decals,
         scene
     });
-    load.innerHTML = "Loading&nbsp;Models...";
     const zip = (a, b) => a.map((k, i) => [k, b[i]]);
     const models =
         /*{
@@ -236,7 +235,7 @@ async function main() {
             "bee",
             "scorpion",
             "queen"
-        ], await Promise.all([
+        ], await AssetManager.loadAll([
             AssetManager.loadGLTFAsync("assets/models/cobolt.glb"),
             AssetManager.loadGLTFAsync("assets/models/pascaliber.glb"),
             AssetManager.loadGLTFAsync("assets/models/station.glb"),
@@ -248,15 +247,14 @@ async function main() {
             AssetManager.loadGLTFAsync("assets/models/bee.glb"),
             AssetManager.loadGLTFAsync("assets/models/scorpion.glb"),
             AssetManager.loadGLTFAsync("assets/models/queen.glb")
-        ])));
-    load.innerHTML = "Loading&nbsp;Animations...";
-    const bossAnimArrs = (await Promise.all([
+        ], load, "Loading&nbsp;Models")));
+    const bossAnimArrs = (await AssetManager.loadAll([
         AssetManager.loadGLTFAsync("assets/models/anims/queenwalk.glb"),
         AssetManager.loadGLTFAsync("assets/models/anims/queenfly.glb"),
         AssetManager.loadGLTFAsync("assets/models/anims/queenpunch.glb"),
         AssetManager.loadGLTFAsync("assets/models/anims/queenblock.glb"),
         AssetManager.loadGLTFAsync("assets/models/anims/queensummon.glb")
-    ])).map(obj => obj.animations);
+    ], load, "Loading&nbsp;Animations")).map(obj => obj.animations);
 
     const bossAnims = {
         "walk": bossAnimArrs[0],

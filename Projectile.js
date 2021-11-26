@@ -155,7 +155,7 @@ class Projectile {
         if (this.emitter) {
             sfx.explosion.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.explosion.detune = 100 * (Math.random() * 6 - 3);
-            sfx.explosion.setVolume(0.025 + 0.025 * Math.random());
+            sfx.explosion.setVolume(0.03 + 0.03 * Math.random());
             sfx.explosion.isPlaying = false;
             sfx.explosion.play();
             for (let i = 0; i < 100; i++) {

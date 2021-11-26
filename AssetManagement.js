@@ -20,4 +20,21 @@ AssetManager.loadAudioAsync = (url) => {
         });
     })
 }
+AssetManager.loadAll = (promiseArr, element, message) => {
+    let count = promiseArr.length;
+    let results = [];
+    element.innerHTML = `${message}&nbsp;(${promiseArr.length - count}&nbsp;/&nbsp;${promiseArr.length})...`
+    return new Promise((resolve, reject) => {
+        promiseArr.forEach((promise, i) => {
+            promise.then(result => {
+                results[i] = result;
+                count--;
+                element.innerHTML = `${message}&nbsp;(${promiseArr.length - count}&nbsp;/&nbsp;${promiseArr.length})...`
+                if (count === 0) {
+                    resolve(results);
+                }
+            })
+        })
+    });
+}
 export { AssetManager };

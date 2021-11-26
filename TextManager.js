@@ -73,7 +73,7 @@ const TextManager = {
         return new Promise((resolve, reject) => {
             window.addEventListener("keypress", e => {
                 if (e.key === key || key === "Any") {
-                    resolve();
+                    resolve(e.key);
                 }
             })
         });
@@ -105,10 +105,12 @@ const TextManager = {
         this.displaying = true;
         this.backgroundElement.style.display = "block";
         await this.scaleUp();
-        await this.typeOut(this.element, "Transmission incoming. \n (Press any key to continue)");
-        await this.waitForKey("Any");
-        await this.typeOut(this.element, script[type] + "\n (Press any key to dismiss)");
-        await this.waitForKey("Any");
+        await this.typeOut(this.element, "Transmission incoming. \n (Press any key to continue) \n (Press K to skip)");
+        const key = await this.waitForKey("Any");
+        if (key !== "k" && key !== "K") {
+            await this.typeOut(this.element, script[type] + "\n (Press any key to dismiss)");
+            await this.waitForKey("Any");
+        }
         await this.scaleDown();
         this.backgroundElement.style.display = "none";
         this.element.innerHTML = "";

@@ -86,6 +86,11 @@ class Station {
     }
     push() {
         if (this.finalButton.material === this.greenMaterial) {
+            sfx.lever.playbackRate = 0.75 + 0.5 * Math.random();
+            sfx.lever.detune = 100 * (Math.random() * 6 - 3);
+            sfx.lever.setVolume(0.75 + 0.5 * Math.random());
+            sfx.lever.isPlaying = false;
+            sfx.lever.play();
             if (!this.pushed) {
                 this.pushed = true;
                 this.animations.forEach(anim => {

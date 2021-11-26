@@ -79,6 +79,7 @@ class Projectile {
         }
         const projTile = new THREE.Vector2(Math.floor(this.mesh.position.x / 5) + 50, Math.floor(this.mesh.position.z / 5) + 50);
         const tileIdx = projTile.x * 100 + projTile.y;
+        const oldLodged = this.lodged;
         if (this.mesh.position.y >= this.heightMap[tileIdx] || this.mesh.position.y <= 0) {
             this.velocity.multiplyScalar(0);
             this.lodged = true;
@@ -91,6 +92,12 @@ class Projectile {
             if (this.emitter) {
                 this.destroy();
             }
+        }
+        if (oldLodged !== this.lodged) {
+            sfx.slashWood.setVolume(0.3 + 0.2 * Math.random());
+            sfx.slashWood.detune = 100 * (Math.random() * 6 - 3);
+            sfx.slashWood.playbackRate = 1 + 0.5 * Math.random();
+            sfx.slashWood.play();
         }
         if (!this.lodged) {
             [this.playerController, ...this.entities].some(entity => {
@@ -114,6 +121,11 @@ class Projectile {
                     if (!entity.takeDamage) {
                         return true;
                     }
+                    sfx.slashHit.setVolume(0.2 + 0.2 * Math.random());
+                    sfx.slashHit.playbackRate = 1 + 0.5 * Math.random();
+                    //sfx.swordHit.detune = 100 * (Math.random() * 6 - 3);
+                    //sfx.slashHit.stop();
+                    sfx.slashHit.play();
                     if (entity === this.playerController) {
                         if (this.playerController.weaponState !== "block") {
                             this.playerController.velocity.add(new THREE.Vector3(this.velocity.x, 0.3 + 0.3 * Math.random(), this.velocity.z));
@@ -141,6 +153,11 @@ class Projectile {
         this.scene.remove(this.mesh);
         this.entities.splice(this.entities.indexOf(this), 1);
         if (this.emitter) {
+            sfx.explosion.playbackRate = 0.75 + 0.5 * Math.random();
+            sfx.explosion.detune = 100 * (Math.random() * 6 - 3);
+            sfx.explosion.setVolume(0.025 + 0.025 * Math.random());
+            sfx.explosion.isPlaying = false;
+            sfx.explosion.play();
             for (let i = 0; i < 100; i++) {
                 const smokeDir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
                 const saturation = 0.875 + Math.random() * 0.25;

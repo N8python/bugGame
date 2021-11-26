@@ -63,11 +63,21 @@ class PlayerController {
                 this.weaponController.addTargetPosition(0, 0, 0, 0.45 / this.weapon.speed);
                 this.weaponController.addTargetRotation(0, 0, 0, 0.45 / this.weapon.speed);
             }
+            sfx.swordBlock.setVolume(0.2 + 0.2 * Math.random());
+            sfx.swordBlock.detune = -100 * (6 + Math.random() * 6);
+            sfx.swordBlock.playbackRate = 0.75 + 0.5 * Math.random();
+            sfx.swordBlock.play();
         }
         const oldHealth = this.health;
         this.health -= amt;
         this.health = Math.max(this.health, 0);
         this.healthLoss += oldHealth - this.health;
+        if (amt > 0 && !this.dead && this.weaponState !== "block") {
+            sfx.playerDamage.setVolume(0.6 + 0.2 * Math.random());
+            sfx.playerDamage.detune = -100 * (12 + Math.random() * 6);
+            sfx.playerDamage.playbackRate = 1.0 + 1.25 * Math.random();
+            sfx.playerDamage.play();
+        }
     }
     revive() {
         this.health = this.maxHealth;
@@ -86,6 +96,12 @@ class PlayerController {
         }
         this.health = Math.max(this.health, 0);
         this.healthLoss *= 0.9;
+        if (this.onGround) {
+            sfx.footsteps.playbackRate = 0.75 + 0.5 * Math.random();
+            sfx.footsteps.detune = 100 * (-Math.random() * 6 + 2);
+            sfx.footsteps.setVolume((1 - 1 / (Math.hypot(this.velocity.x, this.velocity.z) * 1.5 + 1)));
+            sfx.footsteps.play();
+        }
         if (this.health === 0) {
             this.dead = true;
             document.getElementById("death").style.display = "block";
@@ -135,6 +151,10 @@ class PlayerController {
             this.velocity.y -= 0.065;
         }
         if (this.position.y < this.height && !this.onGround) {
+            sfx.thump.setVolume(1.25 + 0.5 * Math.random());
+            sfx.thump.playbackRate = 0.75 + 0.5 * Math.random();
+            sfx.thump.detune = -100 * (Math.random() * 3 + 3);
+            sfx.thump.play();
             this.onGround = true;
             this.velocity.y = 0;
             this.position.y = this.height;
@@ -189,6 +209,10 @@ class PlayerController {
         if (this.position.y > minHeight - 2) {
             this.velocity.y *= -1;
             this.position.y += this.velocity.y;
+            sfx.thump.setVolume(1.25 + 0.5 * Math.random());
+            sfx.thump.playbackRate = 0.75 + 0.5 * Math.random();
+            sfx.thump.detune = -100 * (Math.random() * 3 + 3);
+            sfx.thump.play();
         }
         if (this.position.y > minHeight - 1) {
             this.velocity.y = 0;
@@ -264,6 +288,7 @@ class PlayerController {
     handleSwing({ span = Math.PI / 4, strength = 1, range = 5 }) {
         const cameraDir = this.camera.getWorldDirection(new THREE.Vector3());
         const yDir = Math.atan2(cameraDir.x, cameraDir.z);
+        let anyHit = false;
         this.entities.forEach(entity => {
             if ((entity.memory && entity.memory.maxHealth && entity.memory.health)) {
                 const entityDist = entity.box.distanceToPoint(this.controls.getObject().position);
@@ -272,6 +297,13 @@ class PlayerController {
                     // const angleDiff = yDir - theta;
                     if (Math.abs(angleDifference(theta, yDir)) < span || entityDist < 3) {
                         const away = this.controls.getObject().position.clone().sub(entity.box.getCenter(new THREE.Vector3())).normalize().multiplyScalar(-1.0);
+                        //sfx.slashHit.stop();
+                        sfx.slashHit.setVolume(0.2 + 0.2 * Math.random());
+                        sfx.slashHit.playbackRate = 1 + 0.5 * Math.random();
+                        //sfx.swordHit.detune = 100 * (Math.random() * 6 - 3);
+                        //sfx.slashHit.stop();
+                        sfx.slashHit.play();
+                        anyHit = true;
                         entity.takeDamage((this.weapon.damage + Math.random() * this.weapon.damage) * strength, new THREE.Vector3(away.x, 0, away.z));
                     }
                 }
@@ -288,7 +320,13 @@ class PlayerController {
                     }
                 }
             }
-        })
+        });
+        if (!anyHit) {
+            sfx.swish.setVolume(1.25 + 1.0 * Math.random());
+            sfx.swish.playbackRate = 1.0 + 0.5 * Math.random();
+            sfx.swish.detune = 100 * (Math.random() * 6 - 3);
+            sfx.swish.play();
+        }
     }
     registerClick(input, keys) {
         if (this.dead) {
@@ -341,6 +379,10 @@ class PlayerController {
             const intersections = this.raycaster.intersectObject(this.levelMesh, false);
             const mouseHelper = new THREE.Object3D();
             if (intersections.length > 0 && intersections[0].point.distanceTo(this.getPosition()) < 12.5) {
+                sfx.slashWood.setVolume(0.3 + 0.2 * Math.random());
+                sfx.slashWood.detune = 100 * (Math.random() * 6 - 3);
+                sfx.slashWood.playbackRate = 1 + 0.5 * Math.random();
+                sfx.slashWood.play();
                 mouseHelper.position.copy(intersections[0].point);
                 const n = intersections[0].face.normal.clone();
                 n.transformDirection(this.levelMesh.matrixWorld);

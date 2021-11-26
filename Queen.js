@@ -88,7 +88,8 @@ class Queen {
             flyCounter: 0,
             summonCounter: 0,
             damageCounter: 0,
-            introTick: 0
+            introTick: 0,
+            flapTick: 0
         }
         this.velocity = new THREE.Vector3();
         this.deadParts = [];
@@ -119,6 +120,11 @@ class Queen {
         this.memory.healthLoss += oldHealth - this.memory.health;
     }
     die(startingVelocity) {
+        sfx.explosion.playbackRate = 0.75 + 0.5 * Math.random();
+        sfx.explosion.detune = 100 * (Math.random() * 6 - 3);
+        sfx.explosion.setVolume(0.25 + 0.25 * Math.random());
+        sfx.explosion.isPlaying = false;
+        sfx.explosion.play();
         if (!startingVelocity) {
             startingVelocity = new THREE.Vector3(0, 0, 0);
         }
@@ -179,6 +185,15 @@ class Queen {
         this.smokeEmitter.update(delta, this.camera);
         this.memory.healthLoss *= 0.9;
         this.memory.introTick += 1;
+        this.memory.flapTick += delta;
+        if (this.memory.flapTick > 30 / 24) {
+            this.memory.flapTick = 0;
+            sfx.flap.setVolume(10.0 * Math.min(1 / (Math.min(...this.entities.filter(e => e instanceof Queen && !e.dying).map(queen => Math.hypot(queen.mesh.position.x - this.playerController.getPosition().x, queen.mesh.position.z - this.playerController.getPosition().z))) / 40), 1));
+            sfx.flap.detune = 100 * (6 * Math.random() - 3);
+            sfx.flap.playbackRate = 0.75 + 0.5 * Math.random();
+            sfx.flap.isPlaying = false;
+            sfx.flap.play();
+        }
         if (this.memory.introTick <= 120) {
             this.state = {
                 type: "idle",
@@ -443,6 +458,11 @@ class Queen {
                 }
             }
             if (this.state.memory.time >= 30 / 24 && !this.state.memory.summoned) {
+                sfx.wind.playbackRate = 0.75 + 0.5 * Math.random();
+                sfx.wind.detune = 100 * (Math.random() * 6 - 3);
+                sfx.wind.setVolume(0.5 + 0.5 * Math.random());
+                sfx.wind.isPlaying = false;
+                sfx.wind.play();
                 let seed = Math.random();
                 const placeMag = 5;
                 if (seed < 1 / 3) {
@@ -605,6 +625,14 @@ class Queen {
             }
             part.deathTimer += delta;
             if (part.deathTimer > 2) {
+                if (!this.winded && this.dying) {
+                    this.winded = true;
+                    sfx.wind.playbackRate = 0.75 + 0.5 * Math.random();
+                    sfx.wind.detune = 100 * (Math.random() * 6 - 3);
+                    sfx.wind.setVolume(1.5 + 1.5 * Math.random());
+                    sfx.wind.isPlaying = false;
+                    sfx.wind.play();
+                }
                 part.scale.multiplyScalar(0.975);
                 const worldPos = part.getWorldPosition(new THREE.Vector3());
                 if (Math.random() < 0.25) {

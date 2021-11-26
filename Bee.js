@@ -148,6 +148,10 @@ class Bee {
         } else {
             this.mesh.visible = false;
         }
+        sfx.bee.setVolume(0.25 * Math.min(1 / (Math.min(...this.entities.filter(e => e instanceof Bee && !e.dying).map(bee => Math.hypot(bee.mesh.position.x - this.playerController.getPosition().x, bee.mesh.position.z - this.playerController.getPosition().z))) / 20), 1));
+        sfx.bee.detune = 100 * (6 * Math.random() - 3);
+        sfx.bee.playbackRate = 0.75 + 0.5 * Math.random();
+        sfx.bee.play();
         //this.mesh.position.y = this.flyHeight;
         //this.direction = Math.atan2(this.playerController.getPosition().x - this.mesh.position.x, this.playerController.getPosition().z - this.mesh.position.z);
         this.pitch = -0.25 * Math.sin(performance.now() / 333);

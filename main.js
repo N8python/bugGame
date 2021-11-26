@@ -37,7 +37,7 @@ async function main() {
         }
     }
     load.innerHTML = "Loading&nbsp;Sounds...";
-    let startLevel = 5;
+    let startLevel = 0;
     displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();

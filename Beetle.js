@@ -423,7 +423,7 @@ class Beetle {
     dealExplosionDamage() {
         sfx.explosion.playbackRate = 0.75 + 0.5 * Math.random();
         sfx.explosion.detune = 100 * (Math.random() * 6 - 3);
-        sfx.explosion.setVolume(0.2 + 0.2 * Math.random());
+        sfx.explosion.setVolume((0.2 + 0.2 * Math.random()) * sfxVolume);
         sfx.explosion.isPlaying = false;
         sfx.explosion.play();
         const explosionCenter = this.abdomen.getWorldPosition(new THREE.Vector3());

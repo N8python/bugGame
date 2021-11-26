@@ -63,7 +63,7 @@ class PlayerController {
                 this.weaponController.addTargetPosition(0, 0, 0, 0.45 / this.weapon.speed);
                 this.weaponController.addTargetRotation(0, 0, 0, 0.45 / this.weapon.speed);
             }
-            sfx.swordBlock.setVolume(0.2 + 0.2 * Math.random());
+            sfx.swordBlock.setVolume((0.2 + 0.2 * Math.random()) * sfxVolume);
             sfx.swordBlock.detune = -100 * (6 + Math.random() * 6);
             sfx.swordBlock.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.swordBlock.play();
@@ -73,7 +73,7 @@ class PlayerController {
         this.health = Math.max(this.health, 0);
         this.healthLoss += oldHealth - this.health;
         if (amt > 0 && !this.dead && this.weaponState !== "block") {
-            sfx.playerDamage.setVolume(0.6 + 0.2 * Math.random());
+            sfx.playerDamage.setVolume((0.6 + 0.2 * Math.random()) * sfxVolume);
             sfx.playerDamage.detune = -100 * (12 + Math.random() * 6);
             sfx.playerDamage.playbackRate = 1.0 + 1.25 * Math.random();
             sfx.playerDamage.play();
@@ -90,7 +90,7 @@ class PlayerController {
         document.getElementById("death").style.display = "none";
     }
     update(keys, mouseDown) {
-        if (TextManager.displaying) {
+        if (TextManager.displaying || infoOpened) {
             this.controls.isLocked = false;
             document.exitPointerLock();
         }
@@ -99,7 +99,7 @@ class PlayerController {
         if (this.onGround) {
             sfx.footsteps.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.footsteps.detune = 100 * (-Math.random() * 6 + 2);
-            sfx.footsteps.setVolume((1 - 1 / (Math.hypot(this.velocity.x, this.velocity.z) * 1.5 + 1)));
+            sfx.footsteps.setVolume((1 - 1 / (Math.hypot(this.velocity.x, this.velocity.z) * 1.5 + 1)) * sfxVolume);
             sfx.footsteps.play();
         }
         if (this.health === 0) {
@@ -126,7 +126,7 @@ class PlayerController {
         const cameraDir = this.camera.getWorldDirection(new THREE.Vector3());
         const yDir = Math.atan2(cameraDir.x, cameraDir.z);
         const xzVel = new THREE.Vector2();
-        if (!this.dead && !TextManager.displaying) {
+        if (!this.dead && !TextManager.displaying && !infoOpened) {
             if (keys["w"]) {
                 xzVel.x += Math.sin(yDir);
                 xzVel.y += Math.cos(yDir);
@@ -151,7 +151,7 @@ class PlayerController {
             this.velocity.y -= 0.065;
         }
         if (this.position.y < this.height && !this.onGround) {
-            sfx.thump.setVolume(1.25 + 0.5 * Math.random());
+            sfx.thump.setVolume((1.25 + 0.5 * Math.random()) * sfxVolume);
             sfx.thump.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.thump.detune = -100 * (Math.random() * 3 + 3);
             sfx.thump.play();
@@ -209,7 +209,7 @@ class PlayerController {
         if (this.position.y > minHeight - 2) {
             this.velocity.y *= -1;
             this.position.y += this.velocity.y;
-            sfx.thump.setVolume(1.25 + 0.5 * Math.random());
+            sfx.thump.setVolume((1.25 + 0.5 * Math.random()) * sfxVolume);
             sfx.thump.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.thump.detune = -100 * (Math.random() * 3 + 3);
             sfx.thump.play();
@@ -298,7 +298,7 @@ class PlayerController {
                     if (Math.abs(angleDifference(theta, yDir)) < span || entityDist < 3) {
                         const away = this.controls.getObject().position.clone().sub(entity.box.getCenter(new THREE.Vector3())).normalize().multiplyScalar(-1.0);
                         //sfx.slashHit.stop();
-                        sfx.slashHit.setVolume(0.2 + 0.2 * Math.random());
+                        sfx.slashHit.setVolume((0.2 + 0.2 * Math.random()) * sfxVolume);
                         sfx.slashHit.playbackRate = 1 + 0.5 * Math.random();
                         //sfx.swordHit.detune = 100 * (Math.random() * 6 - 3);
                         //sfx.slashHit.stop();
@@ -322,7 +322,7 @@ class PlayerController {
             }
         });
         if (!anyHit) {
-            sfx.swish.setVolume(1.25 + 1.0 * Math.random());
+            sfx.swish.setVolume((1.25 + 1.0 * Math.random()) * sfxVolume);
             sfx.swish.playbackRate = 1.0 + 0.5 * Math.random();
             sfx.swish.detune = 100 * (Math.random() * 6 - 3);
             sfx.swish.play();
@@ -345,7 +345,7 @@ class PlayerController {
                 doDent = true;
                 this.entities.forEach(entity => {
                     if (entity instanceof Lever) {
-                        if (this.raycaster.ray.intersectsBox(entity.box.clone().expandByScalar(1.5))) {
+                        if (this.raycaster.ray.intersectsBox(entity.box.clone().expandByScalar(1.5)) && this.getPosition().distanceTo(entity.mesh.position) < 30) {
                             if (entity.number === 5 && !entity.pushed) {
                                 this.health += 75;
                                 this.health = Math.min(this.health, this.maxHealth);
@@ -354,7 +354,7 @@ class PlayerController {
                             doDent = false;
                         }
                     } else if (entity instanceof Station) {
-                        if (this.raycaster.ray.intersectsBox(entity.box)) {
+                        if (this.raycaster.ray.intersectsBox(entity.box) && this.getPosition().distanceTo(entity.mesh.position) < 30) {
                             entity.push();
                             doDent = false;
                         }
@@ -379,7 +379,7 @@ class PlayerController {
             const intersections = this.raycaster.intersectObject(this.levelMesh, false);
             const mouseHelper = new THREE.Object3D();
             if (intersections.length > 0 && intersections[0].point.distanceTo(this.getPosition()) < 12.5) {
-                sfx.slashWood.setVolume(0.3 + 0.2 * Math.random());
+                sfx.slashWood.setVolume((0.3 + 0.2 * Math.random()) * sfxVolume);
                 sfx.slashWood.detune = 100 * (Math.random() * 6 - 3);
                 sfx.slashWood.playbackRate = 1 + 0.5 * Math.random();
                 sfx.slashWood.play();

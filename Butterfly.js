@@ -154,7 +154,7 @@ class Butterfly {
         this.memory.flapTick += delta;
         if (this.memory.flapTick > 30 / 24) {
             this.memory.flapTick = 0;
-            sfx.flap.setVolume(5.0 * Math.min(1 / (Math.min(...this.entities.filter(e => e instanceof Butterfly && !e.dying).map(butterfly => Math.hypot(butterfly.mesh.position.x - this.playerController.getPosition().x, butterfly.mesh.position.z - this.playerController.getPosition().z))) / 20), 1));
+            sfx.flap.setVolume(5.0 * sfxVolume * Math.min(1 / (Math.min(...this.entities.filter(e => e instanceof Butterfly && !e.dying).map(butterfly => Math.hypot(butterfly.mesh.position.x - this.playerController.getPosition().x, butterfly.mesh.position.z - this.playerController.getPosition().z))) / 20), 1));
             sfx.flap.detune = 100 * (6 * Math.random() - 3);
             sfx.flap.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.flap.isPlaying = false;

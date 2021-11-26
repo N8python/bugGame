@@ -122,7 +122,7 @@ class Queen {
     die(startingVelocity) {
         sfx.explosion.playbackRate = 0.75 + 0.5 * Math.random();
         sfx.explosion.detune = 100 * (Math.random() * 6 - 3);
-        sfx.explosion.setVolume(0.25 + 0.25 * Math.random());
+        sfx.explosion.setVolume((0.25 + 0.25 * Math.random()) * sfxVolume);
         sfx.explosion.isPlaying = false;
         sfx.explosion.play();
         if (!startingVelocity) {

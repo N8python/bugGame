@@ -1,0 +1,177 @@
+#crosshair::selection {
+    color: none;
+    background: none;
+}
+
+h1::selection {
+    color: none;
+    background: none;
+}
+
+h1 {
+    font-family: 'Roboto Mono', monospace;
+}
+
+button {
+    font-family: 'Roboto Mono', monospace;
+    background-color: rgb(175, 175, 175);
+    transition: 250ms;
+}
+
+button:hover {
+    background-color: rgb(200, 200, 200);
+}
+
+button:active {
+    background-color: rgb(150, 150, 150);
+}
+
+.terminal-text {
+    font-family: 'Roboto Mono', monospace;
+    color: white;
+    margin-left: 24px;
+    text-shadow: 0px 0px 3px white, 0px 0px 10px white;
+}
+
+.glow-text {
+    font-family: 'Roboto Mono', monospace;
+    color: white;
+    text-shadow: 0px 0px 3px white, 0px 0px 10px white;
+}
+
+#transmissionBackground {
+    box-shadow: inset 1em 1em 10px 0px cyan, inset -1em -1em 10px 0px cyan;
+}
+
+#infoBackground {
+    box-shadow: inset 1em 1em 10px 0px cyan, inset -1em -1em 10px 0px cyan;
+}
+
+.terminal-slider {
+    -webkit-appearance: none;
+    /* Hides the slider so that custom slider can be made */
+    width: 100%;
+    /* Specific width is required for Firefox. */
+    background: transparent;
+    /* Otherwise white in Chrome */
+}
+
+.terminal-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+}
+
+.terminal-slider:focus {
+    outline: none;
+    /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+.terminal-slider::-ms-track {
+    width: 100%;
+    cursor: pointer;
+    /* Hides the slider so custom styles can be added */
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+
+.terminal-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: 1px solid white;
+    height: 30px;
+    width: 16px;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    margin-top: -11px;
+    /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+    box-shadow: 0px 0px 3px white, 0px 0px 10px white;
+    /* Add cool effects to your sliders! */
+}
+
+
+/* All the same stuff for Firefox */
+
+.terminal-slider::-moz-range-thumb {
+    box-shadow: 0px 0px 3px white, 0px 0px 10px white;
+    border: 1px solid white;
+    height: 30px;
+    width: 16px;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+
+/* All the same stuff for IE */
+
+.terminal-slider::-ms-thumb {
+    box-shadow: 0px 0px 3px rgb(134, 132, 132), 0px 0px 10px white;
+    border: 1px solid white;
+    height: 30px;
+    width: 16px;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.terminal-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8.4px;
+    cursor: pointer;
+    box-shadow: 0px 0px 3px cyan, 0px 0px 10px cyan;
+    background: cyan;
+    border-radius: 6px;
+}
+
+.terminal-slider:focus::-webkit-slider-runnable-track {
+    background: cyan;
+}
+
+.terminal-slider::-moz-range-track {
+    width: 100%;
+    height: 8.4px;
+    cursor: pointer;
+    box-shadow: 0px 0px 3px cyan, 0px 0px 10px cyan;
+    background: cyan;
+    border-radius: 6px;
+}
+
+.terminal-slider::-ms-track {
+    width: 100%;
+    height: 8.4px;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    border-width: 16px 0;
+    color: transparent;
+}
+
+.terminal-slider::-ms-fill-lower {
+    background: cyan;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px cyan, 0px 0px 10px cyan;
+}
+
+.terminal-slider:focus::-ms-fill-lower {
+    background: cyan;
+}
+
+.terminal-slider::-ms-fill-upper {
+    background: cyan;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px cyan, 0px 0px 10px cyan;
+}
+
+.terminal-slider:focus::-ms-fill-upper {
+    background: cyan;
+}
+
+.terminal-text::selection {
+    color: none;
+    background: none;
+}
+
+.terminal-slider::selection {
+    color: none;
+    background: none;
+}

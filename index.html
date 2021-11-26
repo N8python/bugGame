@@ -9,52 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
-
-    <style>
-        #crosshair::selection {
-            color: none;
-            background: none;
-        }
-        
-        h1::selection {
-            color: none;
-            background: none;
-        }
-        
-        h1 {
-            font-family: 'Roboto Mono', monospace;
-        }
-        
-        button {
-            font-family: 'Roboto Mono', monospace;
-            background-color: rgb(175, 175, 175);
-            transition: 250ms;
-        }
-        
-        button:hover {
-            background-color: rgb(200, 200, 200);
-        }
-        
-        button:active {
-            background-color: rgb(150, 150, 150);
-        }
-        
-        .terminal-text {
-            font-family: 'Roboto Mono', monospace;
-            color: white;
-            margin-left: 24px;
-            text-shadow: 0px 0px 3px white, 0px 0px 10px white;
-        }
-        
-        .terminal-text::selection {
-            color: none;
-            background: none;
-        }
-        
-        #transmissionBackground {
-            box-shadow: inset 1em 1em 10px 0px cyan, inset -1em -1em 10px 0px cyan;
-        }
-    </style>
+    <link href="styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -66,8 +22,8 @@
     <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);" id="enemyLoss"></div>
     <img id="crosshair" style="position: absolute; top:50%;left:50%;transform:translate(-50%, -50%);z-index:5;width:16px;height:16px;opacity: 0.75;" src="assets/images/crosshair.png"></img>
     <div id="death" style="display:none">
-        <h1 style="position: absolute; top:50%;left:50%;transform:translate(-50%, -200%);z-index:5;font-size:120px;color:white;">You&nbsp;died!</h1>
-        <button style="position: absolute; top:50%;left:50%;transform:translate(-50%, 150%);z-index:5;font-size:30px;color:white;" id="restart">Restart Level</button>
+        <h1 style="position: absolute; top:50%;left:50%;transform:translate(-50%, -200%);z-index:5;font-size:120px;color:white;" class="glow-text">You&nbsp;died!</h1>
+        <button style="position: absolute; top:50%;left:50%;transform:translate(-50%, 150%);z-index:5;font-size:30px;color:white;" class="glow-text" id="restart">Restart&nbsp;Level</button>
     </div>
     <div id="transmission">
         <div id="transmissionBackground" style="position:absolute;width:99%;height:98%;background:black;z-index:20;transform:scale(0);display:none;opacity:0;">
@@ -80,7 +36,44 @@
         </div>
     </div>
     <img id="coverScreen" src="assets/images/titlescreen.png" style="z-index:30;width:99%;overflow:hidden;position:absolute;max-height:98%;">
-    <h1 id="load" style="position: absolute; top:50%;left:50%;transform:translate(-50%, 125%);z-index:40;font-size:60px;color:white;">Loading...</h1>
+    <h1 id="load" class="glow-text" style="position: absolute; top:50%;left:50%;transform:translate(-50%, 125%);z-index:40;font-size:60px;color:white;">Loading...</h1>
+    <div style="background-color: grey;width:48px;height:48px;position:absolute;border-radius:8px;left:calc(100% - 134px);" id="info">
+        <i style="font-size:48px;margin-left:3px;" class="fa fa-gear glow-text"></i>
+    </div>
+    <div id="infoDiv" style="display:none;">
+        <div id="infoBackground" style="position:absolute;width:49.5%;height:49%;left:24.75%;top:24.5%;background:black;z-index:20;">
+            <div style="max-width:calc(99% - 1em);">
+                <div style="height:4px"></div>
+                <div>
+                    <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Use WASD to move and mouse to look around.</p>
+                    <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Click to attack, right click to block, shift click to do a fast attack/interact.</p>
+                    <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Flip all levers and kill all enemies to progress to the next level (use your station to do so).</p>
+                    <!--<p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">SFX Volume: <input class="terminal-slider" style="position:relative;bottom:1px;left:20px;width:30%;" type="range" min="0" max="100"></p>
+                    <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Music Volume: <input class="terminal-slider" style="position:relative;bottom:1px;width:30%;" type="range" min="0" max="100"></p>-->
+                    <table style="border-collapse: collapse;">
+                        <tr>
+                            <td class="terminal-text">
+                                <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">SFX Volume:</p>
+                            </td>
+                            <td> <input class="terminal-slider" id="sfxVolume" style="position:relative;bottom:1px;width:200%;" type="range" min="0" max="100" value="50"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Music Volume:</p>
+                            </td>
+                            <td> <input class="terminal-slider" id="musicVolume" style="position:relative;bottom:1px;width:200%;" type="range" min="0" max="100" value="50"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Resolution Scale:</p>
+                            </td>
+                            <td> <input class="terminal-slider" id="renderScale" style="position:relative;bottom:1px;width:200%;" type="range" min="0" max="100" value="50"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <!--<canvas id="canvas" width="700px" height="700px"></canvas>-->
     <script type="module" src="main.js"></script>
 </body>

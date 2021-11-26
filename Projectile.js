@@ -94,7 +94,7 @@ class Projectile {
             }
         }
         if (oldLodged !== this.lodged) {
-            sfx.slashWood.setVolume(0.3 + 0.2 * Math.random());
+            sfx.slashWood.setVolume((0.3 + 0.2 * Math.random()) * sfxVolume);
             sfx.slashWood.detune = 100 * (Math.random() * 6 - 3);
             sfx.slashWood.playbackRate = 1 + 0.5 * Math.random();
             sfx.slashWood.play();
@@ -121,7 +121,7 @@ class Projectile {
                     if (!entity.takeDamage) {
                         return true;
                     }
-                    sfx.slashHit.setVolume(0.2 + 0.2 * Math.random());
+                    sfx.slashHit.setVolume((0.2 + 0.2 * Math.random()) * sfxVolume);
                     sfx.slashHit.playbackRate = 1 + 0.5 * Math.random();
                     //sfx.swordHit.detune = 100 * (Math.random() * 6 - 3);
                     //sfx.slashHit.stop();
@@ -155,7 +155,7 @@ class Projectile {
         if (this.emitter) {
             sfx.explosion.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.explosion.detune = 100 * (Math.random() * 6 - 3);
-            sfx.explosion.setVolume(0.03 + 0.03 * Math.random());
+            sfx.explosion.setVolume((0.03 + 0.03 * Math.random()) * sfxVolume);
             sfx.explosion.isPlaying = false;
             sfx.explosion.play();
             for (let i = 0; i < 100; i++) {

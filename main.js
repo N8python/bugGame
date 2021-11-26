@@ -27,6 +27,7 @@ async function main() {
     TextManager.backgroundElement = document.getElementById("transmissionBackground");
     const load = document.getElementById("load");
     async function displayText(level) {
+        return;
         if (level === 0) {
             await TextManager.displayMessage("Introduction");
             await TextManager.displayMessage("Tutorial");
@@ -37,7 +38,7 @@ async function main() {
         }
     }
     load.innerHTML = "Loading&nbsp;Levels...";
-    let startLevel = 5;
+    let startLevel = 4;
     displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
@@ -49,9 +50,11 @@ async function main() {
         wall: texLoader.load("assets/images/walltextures.png"),
         envMap: texLoader.load("assets/images/oldfactory.png"),
         metalNormal: texLoader.load("assets/images/metalnormal.png"),
-        scratch: texLoader.load("assets/images/scratch.png")
+        scratch: texLoader.load("assets/images/scratch.png"),
+        roughnessWall: texLoader.load("assets/images/roughnessmap.png")
     }
     textures.wall.anisotropy = 16;
+    textures.roughnessWall.anisotropy = 16;
     textures.envMap.mapping = THREE.EquirectangularReflectionMapping;
     textures.envMap.encoding = THREE.sRGBEncoding;
     textures.scratch.anisotropy = 16;
@@ -129,8 +132,6 @@ async function main() {
         // outputEncoding: THREE.sRGBEncoding,
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.VSMShadowMap;
     renderer.setSize(rWidth, rHeight);
     document.body.appendChild(renderer.domElement);
     const controls = new PointerLockControls(camera, renderer.domElement);;
@@ -147,22 +148,8 @@ async function main() {
     scene.add(ambientLight);
     const sunLight = new THREE.DirectionalLight(0xffffff, 0.5);
     sunLight.color.setRGB(1.0, 1.0, 1.0);
-    sunLight.position.set(100, 500, 100);
+    sunLight.position.set(1000, 5000, 1000);
     scene.add(sunLight);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 4096;
-    sunLight.shadow.mapSize.height = 4096;
-    const d = 350;
-    sunLight.shadow.camera.left = -d;
-    sunLight.shadow.camera.right = d;
-    sunLight.shadow.camera.top = d;
-    sunLight.shadow.camera.bottom = -d;
-    sunLight.shadow.camera.near = 0.1;
-    sunLight.shadow.camera.far = 1000;
-    sunLight.shadow.bias = -0.0025;
-    sunLight.shadow.blurSamples = 8;
-    sunLight.shadow.radius = 4;
-    scene.add(sunLight.target);
     scene.add(camera);
     let possibleSpots = [];
     const isOpen = (idx) => {
@@ -187,9 +174,10 @@ async function main() {
         color: new THREE.Color(0.15, 0.15, 0.15),
         map: textures.wall,
         envMap: textures.envMap,
-        metalness: 0.5,
-        roughness: 0.75,
-        side: THREE.DoubleSide
+        metalness: 0.55,
+        roughness: 0.875,
+        side: THREE.DoubleSide,
+        roughnessMap: textures.roughnessWall
     })
     let levelMesh = new THREE.Mesh(levelGeometry, levelMaterial);
     const keys = {};
@@ -363,9 +351,10 @@ async function main() {
             color: new THREE.Color(0.15, 0.15, 0.15),
             map: textures.wall,
             envMap: textures.envMap,
-            metalness: 0.5,
-            roughness: 0.75,
-            side: THREE.DoubleSide
+            metalness: 0.55,
+            roughness: 0.85,
+            side: THREE.DoubleSide,
+            roughnessMap: textures.roughnessWall
         })
         levelMesh = new THREE.Mesh(levelGeometry, levelMaterial);
         possibleSpots = [];
@@ -442,6 +431,9 @@ async function main() {
     }, 100);
 
     function animate() {
+        renderer.setPixelRatio(0.5 + Math.min(document.getElementById("renderScale").value / 100, 0.5) + 2 * Math.max(document.getElementById("renderScale").value / 100 - 0.5, 0));
+        backgroundMusic.setVolume(document.getElementById("musicVolume").value / 100);
+        window.sfxVolume = 1 + 2 * (document.getElementById("sfxVolume").value / 100 - 0.5);
         const delta = (performance.now() - lastUpdate) * 0.001;
         lastUpdate = performance.now();
         renderer.render(scene, camera);
@@ -454,7 +446,7 @@ async function main() {
         }
         const frustum = new THREE.Frustum();
         frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-        if (!TextManager.displaying) {
+        if (!TextManager.displaying && !infoOpened) {
             entities.forEach(entity => {
                 entity.update(delta, frustum);
             });
@@ -510,23 +502,13 @@ async function main() {
         keys[e.key.toLowerCase()] = false;
     }
     document.getElementById("restart").onclick = () => {
-            resetFunction(true);
-        }
-        /*TextManager.typeOut(document.getElementById("textContainer"),
-            `Dear AGENT REPPOH,
-
-        Armies of insects have invaded the KRAM II’s systems. The survival of the KRAM II, our most powerful computer, is vital to our university. You, AGENT, have been tasked with expunging this insect scourge, and restoring all switches and machinery that these foul beasts have disabled. We have provided you with a powerful weapon: The COBOLT. Use it well. We wish you the best of luck.
-
-        KILL ALL INSECTS.
-
-        FLIP ALL LEVERS.
-
-        CLEANSE ALL TUBES.
-
-        Sincerely,
-        DRAVRAH UNIVERSITY
-
-        `);*/
+        resetFunction(true);
+    }
+    window.infoOpened = false;
+    document.getElementById("info").onclick = () => {
+        document.getElementById("infoDiv").style.display = document.getElementById("infoDiv").style.display === "none" ? "block" : "none";
+        infoOpened = document.getElementById("infoDiv").style.display === "block";
+    }
 }
 
 main();

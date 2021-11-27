@@ -8,8 +8,11 @@ h1::selection {
     background: none;
 }
 
-h1 {
-    font-family: 'Roboto Mono', monospace;
+h1,
+span,
+p,
+div {
+    font-family: 'Roboto Mono', monospace !important;
 }
 
 button {

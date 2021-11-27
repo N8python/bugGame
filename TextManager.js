@@ -1,3 +1,4 @@
+import localProxy from "./localProxy.js";
 const script = {
     "Introduction": `Dear AGENT REPPOH,
 
@@ -53,12 +54,17 @@ const script = {
     `,
     "Victory": `Dear AGENT REPPOH,
 
-    You have defeated the INSECT QUEEN and the insect infestations have been thoroughly eliminated. The KRAM II is safe. We thank you for your service. As for your fate, that’s up to you. You can be restored to your original size, or if you particularly enjoy your current job - well, we have other infested computers that need cleansing.
+    You have defeated the INSECT QUEEN and the insect infestations have been thoroughly eliminated. The KRAM II is safe. We thank you for your service. As for your fate, we have not yet perfected the macrofication technology to safely extract you from the computer.
+
+    As a result, you may have to remain inside the computer for a while. Our deepest apologies. While you are there however, feel free to continue descending through the KRAM II's tubes and please clear out any other insects trying to invade.
 
     We are in your utmost debt.
 
     With much gratitude,
     DRAVRAH UNIVERSITY
+
+    (Endless Mode Unlocked - Keep Playing as Long as You Like)
+    (You Can Reset if You Feel Like Returning to The Beginning)
     `
 }
 const TextManager = {
@@ -102,19 +108,22 @@ const TextManager = {
     },
     displaying: false,
     async displayMessage(type) {
-        this.displaying = true;
-        this.backgroundElement.style.display = "block";
-        await this.scaleUp();
-        await this.typeOut(this.element, "Transmission incoming. \n (Press any key to continue) \n (Press K to skip)");
-        const key = await this.waitForKey("Any");
-        if (key !== "k" && key !== "K") {
-            await this.typeOut(this.element, script[type] + "\n (Press any key to dismiss)");
-            await this.waitForKey("Any");
+        if (!localProxy.displayedTexts.includes(type) || type === "Victory") {
+            localProxy.displayedTexts = localProxy.displayedTexts.concat(type);
+            this.displaying = true;
+            this.backgroundElement.style.display = "block";
+            await this.scaleUp();
+            await this.typeOut(this.element, "Transmission incoming. \n (Press any key to continue) \n (Press K to skip)");
+            const key = await this.waitForKey("Any");
+            if ((key !== "k" && key !== "K") || type === "Victory") {
+                await this.typeOut(this.element, script[type] + "\n (Press any key to dismiss)");
+                await this.waitForKey("Any");
+            }
+            await this.scaleDown();
+            this.backgroundElement.style.display = "none";
+            this.element.innerHTML = "";
+            this.displaying = false;
         }
-        await this.scaleDown();
-        this.backgroundElement.style.display = "none";
-        this.element.innerHTML = "";
-        this.displaying = false;
     }
 }
 export default TextManager;

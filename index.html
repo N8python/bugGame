@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <link href="styles.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -41,7 +42,7 @@
         <i style="font-size:48px;margin-left:3px;" class="fa fa-gear glow-text"></i>
     </div>
     <div id="infoDiv" style="display:none;">
-        <div id="infoBackground" style="position:absolute;width:49.5%;height:49%;left:24.75%;top:24.5%;background:black;z-index:20;">
+        <div id="infoBackground" style="position:absolute;left:50%;top:50%;transform: translate(-50%, -50%);background:black;z-index:20;">
             <div style="max-width:calc(99% - 1em);">
                 <div style="height:4px"></div>
                 <div>
@@ -50,26 +51,27 @@
                     <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Flip all levers and kill all enemies to progress to the next level (use your station to do so).</p>
                     <!--<p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">SFX Volume: <input class="terminal-slider" style="position:relative;bottom:1px;left:20px;width:30%;" type="range" min="0" max="100"></p>
                     <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Music Volume: <input class="terminal-slider" style="position:relative;bottom:1px;width:30%;" type="range" min="0" max="100"></p>-->
-                    <table style="border-collapse: collapse;">
+                    <table style="border-collapse: collapse;width:95%">
                         <tr>
                             <td class="terminal-text">
-                                <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">SFX Volume:</p>
+                                <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word;">SFX Volume:</p>
                             </td>
-                            <td> <input class="terminal-slider" id="sfxVolume" style="position:relative;bottom:1px;width:200%;" type="range" min="0" max="100" value="50"></td>
+                            <td> <input class="terminal-slider" id="sfxVolume" style="position:relative;bottom:1px;width:100%;" type="range" min="0" max="100" value="50"></td>
                         </tr>
                         <tr>
                             <td>
-                                <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Music Volume:</p>
+                                <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word;">Music Volume:</p>
                             </td>
-                            <td> <input class="terminal-slider" id="musicVolume" style="position:relative;bottom:1px;width:200%;" type="range" min="0" max="100" value="50"></td>
+                            <td> <input class="terminal-slider" id="musicVolume" style="position:relative;bottom:1px;width:100%;" type="range" min="0" max="100" value="50"></td>
                         </tr>
                         <tr>
                             <td>
                                 <p class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Resolution Scale:</p>
                             </td>
-                            <td> <input class="terminal-slider" id="renderScale" style="position:relative;bottom:1px;width:200%;" type="range" min="0" max="100" value="50"></td>
+                            <td> <input class="terminal-slider" id="renderScale" style="position:relative;bottom:1px;width:100%;" type="range" min="0" max="100" value="50"></td>
                         </tr>
                     </table>
+                    <button style="font-size:30px;color:white;margin-left: 24px;margin-bottom:24px;margin-top:16px;" class="glow-text" id="restartGame">Restart&nbsp;Game</button>
                 </div>
             </div>
         </div>

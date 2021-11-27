@@ -167,11 +167,13 @@ class PlayerController {
         }
         this.velocity.x += xzVel.x;
         this.velocity.z += xzVel.y;
-        if (this.onGround) {
-            this.velocity.multiplyScalar(0.95);
-            this.position.y = this.height;
-        } else {
-            this.velocity.multiplyScalar(0.975);
+        if (!TextManager.displaying && !infoOpened) {
+            if (this.onGround) {
+                this.velocity.multiplyScalar(0.95);
+                this.position.y = this.height;
+            } else {
+                this.velocity.multiplyScalar(0.975);
+            }
         }
         /*const playerPos2D = new THREE.Vector2(controls.getObject().position.x, controls.getObject().position.z);
         const tile = new THREE.Vector2(Math.floor(playerPos2D.x / 5) + 50, Math.floor(playerPos2D.y / 5) + 50);*/
@@ -243,13 +245,15 @@ class PlayerController {
                 }
             }
         })
-
-        this.position.add(this.velocity); // += velocity.x;
+        if (!TextManager.displaying && !infoOpened) {
+            this.position.add(this.velocity);
+        }
+        // += velocity.x;
         //playerElevation += velocity.y;
         const lowFreq = 0.05 * Math.sin(performance.now() / 1000);
         const highFreq = 0.5 * Math.sin(performance.now() / 100);
         this.controls.getObject().position.x = this.position.x;
-        this.controls.getObject().position.y = this.position.y - 0.2 * (lowFreq + (highFreq - lowFreq) * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5));
+        this.controls.getObject().position.y = this.position.y - 0.2 * +(!TextManager.displaying && !infoOpened) * (lowFreq + (highFreq - lowFreq) * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5));
         this.controls.getObject().position.z = this.position.z;
         if (this.weapon) {
             //this.weapon.position.y = -0.5 - 0.1 * (lowFreq + (highFreq - lowFreq) * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5));
@@ -261,7 +265,7 @@ class PlayerController {
                 });
                 this.camera.add(this.weapon.model);
             } else {
-                this.weaponController.update(-0.1 * (lowFreq + (highFreq - lowFreq) * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5)));
+                this.weaponController.update(-0.1 * (lowFreq + (highFreq - lowFreq) * (Math.hypot(this.velocity.x, this.velocity.z) / 0.5)) * +(!TextManager.displaying && !infoOpened));
                 if (this.weaponController.idle() && this.weaponState !== "idle" && this.weaponState !== "block") {
                     this.weaponState = "idle";
                 }

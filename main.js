@@ -22,12 +22,12 @@ import { LevelGenerator } from "./LevelGenerator.js";
 import { EnemyManager } from "./EnemyManager.js";
 import Level from "./Level.js";
 import TextManager from "./TextManager.js";
+import localProxy from "./localProxy.js";
 async function main() {
     TextManager.element = document.getElementById("textContainer");
     TextManager.backgroundElement = document.getElementById("transmissionBackground");
     const load = document.getElementById("load");
     async function displayText(level) {
-        return;
         if (level === 0) {
             await TextManager.displayMessage("Introduction");
             await TextManager.displayMessage("Tutorial");
@@ -37,8 +37,11 @@ async function main() {
             await TextManager.displayMessage("Boss");
         }
     }
+    if (!localProxy.displayedTexts) {
+        localProxy.displayedTexts = [];
+    }
     load.innerHTML = "Loading&nbsp;Levels...";
-    let startLevel = 4;
+    let startLevel = localProxy.levelNumber ? localProxy.levelNumber : 0;
     displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
@@ -318,6 +321,7 @@ async function main() {
     models.lever.scene.traverse((child) => {
         if (child.isMesh) {
             child.material.envMap = textures.envMap;
+            child.material.normalMap = textures.metalNormal;
         }
     });
     models.queen.scene.traverse((child) => {
@@ -429,11 +433,24 @@ async function main() {
     setTimeout(() => {
         load.innerHTML = "";
     }, 100);
+    if (localProxy.renderScale) {
+        document.getElementById("renderScale").value = localProxy.renderScale;
+    }
+    if (localProxy.musicVolume) {
+        document.getElementById("musicVolume").value = localProxy.musicVolume;
+    }
+    if (localProxy.sfxVolume) {
+        document.getElementById("sfxVolume").value = localProxy.sfxVolume;
+    }
 
     function animate() {
+        localProxy.levelNumber = level.number;
         renderer.setPixelRatio(0.5 + Math.min(document.getElementById("renderScale").value / 100, 0.5) + 2 * Math.max(document.getElementById("renderScale").value / 100 - 0.5, 0));
         backgroundMusic.setVolume(document.getElementById("musicVolume").value / 100);
         window.sfxVolume = 1 + 2 * (document.getElementById("sfxVolume").value / 100 - 0.5);
+        localProxy.renderScale = document.getElementById("renderScale").value;
+        localProxy.musicVolume = document.getElementById("musicVolume").value;
+        localProxy.sfxVolume = document.getElementById("sfxVolume").value;
         const delta = (performance.now() - lastUpdate) * 0.001;
         lastUpdate = performance.now();
         renderer.render(scene, camera);
@@ -503,6 +520,31 @@ async function main() {
     }
     document.getElementById("restart").onclick = () => {
         resetFunction(true);
+    }
+    document.getElementById("restartGame").onclick = () => {
+        swal({
+                title: "Are you sure?",
+                text: "All your progress will be lost. You will be returned to the beginning of the game",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    swal("Your game will now restart.", {
+                        icon: "success",
+                    }).then(() => {
+                        localProxy.levelNumber = 0;
+                        localProxy.displayedTexts = [];
+                        localProxy.musicVolume = 50;
+                        localProxy.sfxVolume = 50;
+                        localProxy.renderScale = 50;
+                        location.reload();
+                    });
+                } else {
+                    swal("Your save is safe.");
+                }
+            });
     }
     window.infoOpened = false;
     document.getElementById("info").onclick = () => {

@@ -113,7 +113,7 @@ const TextManager = {
             this.displaying = true;
             this.backgroundElement.style.display = "block";
             await this.scaleUp();
-            await this.typeOut(this.element, "Transmission incoming. \n (Press any key to continue) \n (Press K to skip)");
+            await this.typeOut(this.element, `Transmission incoming. \n (Press any key to continue)${type !== "Victory" ? "\n (Press K to skip)": ""}`);
             const key = await this.waitForKey("Any");
             if ((key !== "k" && key !== "K") || type === "Victory") {
                 await this.typeOut(this.element, script[type] + "\n (Press any key to dismiss)");

@@ -442,15 +442,24 @@ async function main() {
     if (localProxy.sfxVolume) {
         document.getElementById("sfxVolume").value = localProxy.sfxVolume;
     }
+    const levelDisplay = document.getElementById("levelDisplay");
 
     function animate() {
-        localProxy.levelNumber = level.number;
+        if (!window.restarting) {
+            localProxy.levelNumber = level.number;
+            localProxy.renderScale = document.getElementById("renderScale").value;
+            localProxy.musicVolume = document.getElementById("musicVolume").value;
+            localProxy.sfxVolume = document.getElementById("sfxVolume").value;
+        }
         renderer.setPixelRatio(0.5 + Math.min(document.getElementById("renderScale").value / 100, 0.5) + 2 * Math.max(document.getElementById("renderScale").value / 100 - 0.5, 0));
         backgroundMusic.setVolume(document.getElementById("musicVolume").value / 100);
         window.sfxVolume = 1 + 2 * (document.getElementById("sfxVolume").value / 100 - 0.5);
-        localProxy.renderScale = document.getElementById("renderScale").value;
-        localProxy.musicVolume = document.getElementById("musicVolume").value;
-        localProxy.sfxVolume = document.getElementById("sfxVolume").value;
+        levelDisplay.innerHTML = `Level: ${level.number + 1}`;
+        if (level.number === 5) {
+            levelDisplay.style.top = "88px";
+        } else {
+            levelDisplay.style.top = "52px";
+        }
         const delta = (performance.now() - lastUpdate) * 0.001;
         lastUpdate = performance.now();
         renderer.render(scene, camera);
@@ -524,7 +533,7 @@ async function main() {
     document.getElementById("restartGame").onclick = () => {
         swal({
                 title: "Are you sure?",
-                text: "All your progress will be lost. You will be returned to the beginning of the game",
+                text: "All your progress will be lost. You will be returned to the beginning of the game.",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
@@ -539,6 +548,14 @@ async function main() {
                         localProxy.musicVolume = 50;
                         localProxy.sfxVolume = 50;
                         localProxy.renderScale = 50;
+                        setInterval(() => {
+                            localProxy.levelNumber = 0;
+                            localProxy.displayedTexts = [];
+                            localProxy.musicVolume = 50;
+                            localProxy.sfxVolume = 50;
+                            localProxy.renderScale = 50;
+                        });
+                        window.restarting = true;
                         location.reload();
                     });
                 } else {

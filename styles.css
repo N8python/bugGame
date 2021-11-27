@@ -178,3 +178,19 @@ button:active {
     color: none;
     background: none;
 }
+
+#healthBar {
+    box-shadow: 0px 0px 3px lime, 0px 0px 10px lime;
+}
+
+#healthLoss {
+    box-shadow: 0px 0px 3px white, 0px 0px 10px white;
+}
+
+#enemyBar {
+    box-shadow: 0px 0px 3px red, 0px 0px 10px red;
+}
+
+#healthLoss {
+    box-shadow: 0px 0px 3px white, 0px 0px 10px white;
+}

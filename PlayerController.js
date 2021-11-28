@@ -6,6 +6,7 @@ import Station from './Station.js';
 import { DecalGeometry } from "https://cdn.skypack.dev/three@0.133.0/examples/jsm/geometries/DecalGeometry.js";
 import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/controls/PointerLockControls.js';
 import TextManager from './TextManager.js';
+import DamageIndicator from "./DamageIndicator.js";
 
 function angleDifference(angle1, angle2) {
     const diff = ((angle2 - angle1 + Math.PI) % (Math.PI * 2)) - Math.PI;
@@ -308,7 +309,20 @@ class PlayerController {
                         //sfx.slashHit.stop();
                         sfx.slashHit.play();
                         anyHit = true;
-                        entity.takeDamage((this.weapon.damage + Math.random() * this.weapon.damage) * strength, new THREE.Vector3(away.x, 0, away.z));
+                        const dmg = (this.weapon.damage + Math.random() * this.weapon.damage) * strength;
+                        entity.takeDamage(dmg, new THREE.Vector3(away.x, 0, away.z));
+                        if (damageIndicators) {
+                            const damageIndicator = new DamageIndicator({
+                                scene: this.scene,
+                                position: entity.mesh.position.clone(),
+                                damage: Math.round(dmg),
+                                xVel: cameraDir.x,
+                                zVel: cameraDir.z,
+                                entities: this.entities
+                            });
+                            this.scene.add(damageIndicator.mesh);
+                            this.entities.push(damageIndicator);
+                        }
                     }
                 }
             } else if (entity instanceof Projectile) {
@@ -375,7 +389,25 @@ class PlayerController {
                 this.weaponController.addTargetRotation(0, 0, 0, 0.35 / this.weapon.speed);
                 this.handleSwing({ span: Math.PI / 4, strength: 1.5, range: 7.5 });
                 this.weaponState = "slash";
+                this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
                 doDent = true;
+                this.entities.forEach(entity => {
+                    if (entity instanceof Lever) {
+                        if (this.raycaster.ray.intersectsBox(entity.box.clone().expandByScalar(1.5)) && this.getPosition().distanceTo(entity.mesh.position) < 30) {
+                            if (entity.number === 5 && !entity.pushed) {
+                                this.health += 75;
+                                this.health = Math.min(this.health, this.maxHealth);
+                            }
+                            entity.push();
+                            doDent = false;
+                        }
+                    } else if (entity instanceof Station) {
+                        if (this.raycaster.ray.intersectsBox(entity.box) && this.getPosition().distanceTo(entity.mesh.position) < 30) {
+                            entity.push();
+                            doDent = false;
+                        }
+                    }
+                });
             }
         }
         if (doDent) {

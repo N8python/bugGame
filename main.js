@@ -442,6 +442,9 @@ async function main() {
     if (localProxy.sfxVolume) {
         document.getElementById("sfxVolume").value = localProxy.sfxVolume;
     }
+    if (localProxy.damageIndicators !== undefined) {
+        document.getElementById("damageIndicators").checked = localProxy.damageIndicators;
+    }
     const levelDisplay = document.getElementById("levelDisplay");
 
     function animate() {
@@ -450,7 +453,9 @@ async function main() {
             localProxy.renderScale = document.getElementById("renderScale").value;
             localProxy.musicVolume = document.getElementById("musicVolume").value;
             localProxy.sfxVolume = document.getElementById("sfxVolume").value;
+            localProxy.damageIndicators = document.getElementById("damageIndicators").checked;
         }
+        window.damageIndicators = document.getElementById("damageIndicators").checked;
         renderer.setPixelRatio(0.5 + Math.min(document.getElementById("renderScale").value / 100, 0.5) + 2 * Math.max(document.getElementById("renderScale").value / 100 - 0.5, 0));
         backgroundMusic.setVolume(document.getElementById("musicVolume").value / 100);
         window.sfxVolume = 1 + 2 * (document.getElementById("sfxVolume").value / 100 - 0.5);
@@ -548,12 +553,14 @@ async function main() {
                         localProxy.musicVolume = 50;
                         localProxy.sfxVolume = 50;
                         localProxy.renderScale = 50;
+                        localProxy.damageIndicators = true;
                         setInterval(() => {
                             localProxy.levelNumber = 0;
                             localProxy.displayedTexts = [];
                             localProxy.musicVolume = 50;
                             localProxy.sfxVolume = 50;
                             localProxy.renderScale = 50;
+                            localProxy.damageIndicators = true;
                         });
                         window.restarting = true;
                         location.reload();

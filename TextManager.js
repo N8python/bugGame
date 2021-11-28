@@ -25,11 +25,11 @@ const script = {
     Right click to block.
     Shift click to do a quick attack or interact.
     
-    Interact with levers to flip them.
+    Interact or click levers to flip them.
     
     You are additionally provided with a station. This device displays the amount of insects remaining and the amount of levers you have pressed.
     
-    Once all levers are pressed and all insects killed, interact with your station to progress to the next level.
+    Once all levers are pressed and all insects killed, interact/click with your station to progress to the next level.
     
     Hopefully these suggestions allow you to complete your mission.
     
@@ -54,9 +54,9 @@ const script = {
     `,
     "Victory": `Dear AGENT REPPOH,
 
-    You have defeated the INSECT QUEEN and the insect infestations have been thoroughly eliminated. The KRAM II is safe. We thank you for your service. As for your fate, we have not yet perfected the macrofication technology to safely extract you from the computer.
+    You have defeated the INSECT QUEEN and the insect infestations have been thoroughly eliminated. The KRAM II is safe. We thank you for your service. As for your fate, we have not yet perfected the macrofication technology to safely extract you from the KRAM II .
 
-    As a result, you may have to remain inside the computer for a while. Our deepest apologies. While you are there however, feel free to continue descending through the KRAM II's tubes and please clear out any other insects trying to invade.
+    As a result, you may have to remain inside the KRAM II for a while. Our deepest apologies. While you are there however, feel free to continue descending through the KRAM II's tubes and please clear out any other insects trying to invade.
 
     We are in your utmost debt.
 

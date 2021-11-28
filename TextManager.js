@@ -80,6 +80,8 @@ const script = {
 
     SFX - Freesound.org, Kwahmah_02, and InspectorJ
 
+    Testing and Debugging - N8, Becky Rose, and the Spoon Gang
+
     Thanks for playing!
     `
 }

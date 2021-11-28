@@ -363,7 +363,7 @@ class PlayerController {
                 doDent = true;
                 this.entities.forEach(entity => {
                     if (entity instanceof Lever) {
-                        if (this.raycaster.ray.intersectsBox(entity.box.clone().expandByScalar(1.5)) && this.getPosition().distanceTo(entity.mesh.position) < 30) {
+                        if (this.raycaster.ray.intersectsBox(entity.box.clone().expandByScalar(2)) && this.getPosition().distanceTo(entity.mesh.position) < 30) {
                             if (entity.number === 5 && !entity.pushed) {
                                 this.health += 75;
                                 this.health = Math.min(this.health, this.maxHealth);

@@ -692,7 +692,10 @@ class Queen {
         if (this.dying && this.deadParts.length === 0) {
             if (!this.hadVictory) {
                 this.hadVictory = true;
-                TextManager.displayMessage("Victory");
+                (async() => {
+                    await TextManager.displayMessage("Victory");
+                    await TextManager.displayMessage("Credits");
+                })();
             }
         }
         if (!this.dying) {

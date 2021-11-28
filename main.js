@@ -75,27 +75,37 @@ async function main() {
         side: THREE.DoubleSide
     });
     let decals = [];
-    const rWidth = window.innerWidth * 0.99;
-    const rHeight = window.innerHeight * 0.98;
+    let rWidth = window.innerWidth * 0.99;
+    let rHeight = window.innerHeight * 0.98;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, rWidth / rHeight, 0.1, 1000);
     const listener = new THREE.AudioListener();
     camera.add(listener);
+    window.addEventListener('resize', () => {
+        rWidth = window.innerWidth * 0.99;
+        rHeight = window.innerHeight * 0.98;
+        camera.aspect = rWidth / rHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(rWidth, rHeight);
+
+    }, false);
+
     const backgroundMusic = new THREE.Audio(listener);
     backgroundMusic.setBuffer(await AssetManager.loadAudioAsync("assets/sounds/music/backgroundMusic.mp3"));
     backgroundMusic.setLoop(true);
     backgroundMusic.setVolume(0.5);
     const sfxArray = await AssetManager.loadAll([
-        AssetManager.loadAudioAsync("assets/sounds/sfx/slash-hit.ogg"),
+        AssetManager.loadAudioAsync("assets/sounds/sfx/slash-hit.mp3"),
         AssetManager.loadAudioAsync("assets/sounds/sfx/swish.wav"), // kwahmah_02
         AssetManager.loadAudioAsync("assets/sounds/sfx/slash-wood.wav"), // "Dropping, Wood, C.wav", InspectorJ
         AssetManager.loadAudioAsync("assets/sounds/sfx/player-damage.wav"), // "Digging, Ice, Hammer, A.wav", InspectorJ
         AssetManager.loadAudioAsync("assets/sounds/sfx/sword-block.wav"),
-        AssetManager.loadAudioAsync("assets/sounds/sfx/footsteps.mov"),
+        AssetManager.loadAudioAsync("assets/sounds/sfx/footsteps.mp3"),
         AssetManager.loadAudioAsync("assets/sounds/sfx/thump.wav"),
         AssetManager.loadAudioAsync("assets/sounds/sfx/explosion.wav"),
-        AssetManager.loadAudioAsync("assets/sounds/sfx/lever.mov"),
-        AssetManager.loadAudioAsync("assets/sounds/sfx/wind.m4a"),
+        AssetManager.loadAudioAsync("assets/sounds/sfx/lever.mp3"),
+        AssetManager.loadAudioAsync("assets/sounds/sfx/wind.mp3"),
         AssetManager.loadAudioAsync("assets/sounds/sfx/bee.wav"),
         AssetManager.loadAudioAsync("assets/sounds/sfx/flap.wav")
 

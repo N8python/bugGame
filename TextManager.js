@@ -65,6 +65,22 @@ const script = {
 
     (Endless Mode Unlocked - Keep Playing as Long as You Like)
     (You Can Reset if You Feel Like Returning to The Beginning)
+    `,
+    "Credits": `BUGGED OUT
+
+    Produced for Github Game Off 2021.
+
+    Coding - N8
+
+    Art/3D Models - N8
+
+    Music - N8
+
+    Creative Concepts - N8, Omega, and the Spoon Gang
+
+    SFX - Freesound.org, Kwahmah_02, and InspectorJ
+
+    Thanks for playing!
     `
 }
 const TextManager = {
@@ -108,14 +124,14 @@ const TextManager = {
     },
     displaying: false,
     async displayMessage(type) {
-        if (!localProxy.displayedTexts.includes(type) || type === "Victory") {
+        if (!localProxy.displayedTexts.includes(type) || (type === "Victory" || type === "Credits")) {
             localProxy.displayedTexts = localProxy.displayedTexts.concat(type);
             this.displaying = true;
             this.backgroundElement.style.display = "block";
             await this.scaleUp();
             await this.typeOut(this.element, `Transmission incoming. \n (Press any key to continue)${type !== "Victory" ? "\n (Press K to skip)": ""}`);
             const key = await this.waitForKey("Any");
-            if ((key !== "k" && key !== "K") || type === "Victory") {
+            if ((key !== "k" && key !== "K") || (type === "Victory" || type === "Credits")) {
                 await this.typeOut(this.element, script[type] + "\n (Press any key to dismiss)");
                 await this.waitForKey("Any");
             }

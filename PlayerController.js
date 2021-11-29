@@ -221,6 +221,26 @@ class PlayerController {
             this.velocity.y = 0;
             this.position.y -= 3;
         }
+        const verticesToCheckBlock = [
+            [-0.25, -0.25],
+            [-0.25, 0.25],
+            [0.25, 0.25],
+            [0.25, -0.25]
+        ];
+        let hitBlock = false;
+        verticesToCheckBlock.forEach(vertex => {
+            const playerPos2D = new THREE.Vector2(this.controls.getObject().position.x + vertex[0], this.controls.getObject().position.z + vertex[1]);
+            const tile = new THREE.Vector2(Math.floor(playerPos2D.x / 5) + 50, Math.floor(playerPos2D.y / 5) + 50);
+            if (this.tileMap[tile.x * 100 + tile.y] !== 1) {
+                hitBlock = true;
+            }
+        });
+        if (hitBlock && this.lastSafePosition) {
+            this.position.add(this.lastSafePosition.clone().sub(this.position).multiplyScalar(1));
+            this.velocity.multiplyScalar(0);
+        } else {
+            this.lastSafePosition = this.position.clone();
+        }
         if (hit) {
             const tileIdx = hitTile.x * 100 + hitTile.y;
             if (this.tileMap[tileIdx - 1] === 2 && this.tileMap[tileIdx + 1] === 2) {

@@ -23,6 +23,7 @@ import { EnemyManager } from "./EnemyManager.js";
 import Level from "./Level.js";
 import TextManager from "./TextManager.js";
 import localProxy from "./localProxy.js";
+window.console.warn = () => {};
 async function main() {
     TextManager.element = document.getElementById("textContainer");
     TextManager.backgroundElement = document.getElementById("transmissionBackground");

@@ -20,6 +20,14 @@ AssetManager.loadAudioAsync = (url) => {
         });
     })
 }
+
+AssetManager.loadTextureAsync = (url) => {
+    return new Promise((resolve, reject) => {
+        THREE.ImageUtils.loadTexture(url, null, (tex) => {
+            resolve(tex);
+        })
+    })
+}
 AssetManager.loadAll = (promiseArr, element, message) => {
     let count = promiseArr.length;
     let results = [];

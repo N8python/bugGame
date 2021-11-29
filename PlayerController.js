@@ -222,8 +222,6 @@ class PlayerController {
             this.position.y -= 3;
         }
         if (hit) {
-            //controls.getObject().position.x -= velocity.x;
-            //controls.getObject().position.z -= velocity.z;
             const tileIdx = hitTile.x * 100 + hitTile.y;
             if (this.tileMap[tileIdx - 1] === 2 && this.tileMap[tileIdx + 1] === 2) {
                 this.velocity.x *= -1;

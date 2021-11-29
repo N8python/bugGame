@@ -45,17 +45,27 @@ async function main() {
     displayText(startLevel);
     let { tileMap, sourceMap, heightMap } = startLevel === 5 ? LevelGenerator.generateBossMaps() : LevelGenerator.generateMaps();
     const texLoader = new THREE.TextureLoader();
-    const skyTex = texLoader.load("assets/images/clouds.jpeg");
+    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
+    const textures =
+        Object.fromEntries(zip([
+            "wall",
+            "envMap",
+            "metalNormal",
+            "scratch",
+            "roughnessWall",
+            "skyTex"
+        ], await AssetManager.loadAll([
+            AssetManager.loadTextureAsync("assets/images/walltextures.png"),
+            AssetManager.loadTextureAsync("assets/images/oldfactory.png"),
+            AssetManager.loadTextureAsync("assets/images/metalnormal.png"),
+            AssetManager.loadTextureAsync("assets/images/scratch.png"),
+            AssetManager.loadTextureAsync("assets/images/roughnessmap.png"),
+            AssetManager.loadTextureAsync("assets/images/clouds.jpeg"),
+        ], load, "Loading&nbsp;Textures")));
+    const skyTex = textures.skyTex;
     skyTex.wrapS = THREE.RepeatWrapping;
     skyTex.wrapT = THREE.RepeatWrapping;
     skyTex.repeat.set(4, 4);
-    const textures = {
-        wall: texLoader.load("assets/images/walltextures.png"),
-        envMap: texLoader.load("assets/images/oldfactory.png"),
-        metalNormal: texLoader.load("assets/images/metalnormal.png"),
-        scratch: texLoader.load("assets/images/scratch.png"),
-        roughnessWall: texLoader.load("assets/images/roughnessmap.png")
-    }
     textures.wall.anisotropy = 16;
     textures.roughnessWall.anisotropy = 16;
     textures.envMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -209,7 +219,6 @@ async function main() {
         decals,
         scene
     });
-    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
     const models =
         /*{
                cobolt: await AssetManager.loadGLTFAsync("assets/models/cobolt.glb"),

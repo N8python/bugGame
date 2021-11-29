@@ -64,7 +64,7 @@ const script = {
     DRAVRAH UNIVERSITY
 
     (Endless Mode Unlocked - Keep Playing as Long as You Like)
-    (You Can Reset if You Feel Like Returning to The Beginning)
+    (You Can Reset if You Feel Like Returning to the Beginning)
     `,
     "Credits": `BUGGED OUT
 

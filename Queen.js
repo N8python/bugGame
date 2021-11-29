@@ -308,7 +308,7 @@ class Queen {
         //this.direction = Math.atan2(this.playerController.getPosition().x - this.mesh.position.x, this.playerController.getPosition().z - this.mesh.position.z);
         if (this.targetFlinch !== 0) {
             this.flinch += 0.05;
-            if (Math.abs(this.targetFlinch - this.flinch) < 0.05) {
+            if (Math.abs(this.targetFlinch - this.flinch) < 0.06 || this.flinch > this.targetFlinch) {
                 this.flinch = this.targetFlinch;
                 this.targetFlinch = 0;
             }

@@ -45,7 +45,7 @@ class Lever {
         if (!this.pushed) {
             sfx.lever.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.lever.detune = 100 * (Math.random() * 6 - 3);
-            sfx.lever.setVolume(0.75 + 0.5 * Math.random());
+            sfx.lever.setVolume((0.75 + 0.5 * Math.random()) * sfxVolume);
             sfx.lever.isPlaying = false;
             sfx.lever.play();
             this.pushed = true;

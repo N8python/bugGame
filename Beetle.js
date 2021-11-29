@@ -248,7 +248,7 @@ class Beetle {
         //this.mesh.rotation.y = this.direction;
         if (this.targetFlinch !== 0) {
             this.flinch += 0.05;
-            if (Math.abs(this.targetFlinch - this.flinch) < 0.05) {
+            if (Math.abs(this.targetFlinch - this.flinch) < 0.06 || this.flinch > this.targetFlinch) {
                 this.flinch = this.targetFlinch;
                 this.targetFlinch = 0;
             }

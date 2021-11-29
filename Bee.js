@@ -148,7 +148,7 @@ class Bee {
         } else {
             this.mesh.visible = false;
         }
-        sfx.bee.setVolume(0.25 * Math.min(1 / (Math.min(...this.entities.filter(e => e instanceof Bee && !e.dying).map(bee => Math.hypot(bee.mesh.position.x - this.playerController.getPosition().x, bee.mesh.position.z - this.playerController.getPosition().z))) / 20), 1));
+        sfx.bee.setVolume(0.25 * sfxVolume * Math.min(1 / (Math.min(...this.entities.filter(e => e instanceof Bee && !e.dying).map(bee => Math.hypot(bee.mesh.position.x - this.playerController.getPosition().x, bee.mesh.position.z - this.playerController.getPosition().z))) / 20), 1));
         sfx.bee.detune = 100 * (6 * Math.random() - 3);
         sfx.bee.playbackRate = 0.75 + 0.5 * Math.random();
         sfx.bee.play();
@@ -157,7 +157,7 @@ class Bee {
         this.pitch = -0.25 * Math.sin(performance.now() / 333);
         if (this.targetFlinch !== 0) {
             this.flinch += 0.05;
-            if (Math.abs(this.targetFlinch - this.flinch) < 0.05) {
+            if (Math.abs(this.targetFlinch - this.flinch) < 0.06 || this.flinch > this.targetFlinch) {
                 this.flinch = this.targetFlinch;
                 this.targetFlinch = 0;
             }

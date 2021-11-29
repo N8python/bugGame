@@ -91,15 +91,6 @@ async function main() {
     const camera = new THREE.PerspectiveCamera(75, rWidth / rHeight, 0.1, 1000);
     const listener = new THREE.AudioListener();
     camera.add(listener);
-    window.addEventListener('resize', () => {
-        rWidth = window.innerWidth * 0.99;
-        rHeight = window.innerHeight * 0.98;
-        camera.aspect = rWidth / rHeight;
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(rWidth, rHeight);
-
-    }, false);
 
     const backgroundMusic = new THREE.Audio(listener);
     backgroundMusic.setBuffer(await AssetManager.loadAudioAsync("assets/sounds/music/backgroundMusic.mp3"));
@@ -156,6 +147,15 @@ async function main() {
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setSize(rWidth, rHeight);
+    window.addEventListener('resize', () => {
+        rWidth = window.innerWidth * 0.99;
+        rHeight = window.innerHeight * 0.98;
+        camera.aspect = rWidth / rHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(rWidth, rHeight);
+
+    }, false);
     document.body.appendChild(renderer.domElement);
     const controls = new PointerLockControls(camera, renderer.domElement);;
     controls.enableDamping = true;

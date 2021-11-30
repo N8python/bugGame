@@ -37,9 +37,11 @@ class Level {
         this.tileMap = tileMap;
         this.number = number;
         this.bossAnims = bossAnims;
-        levelDefault[0] = 7 + Math.floor(7 * Math.random());
-        levelDefault[1] = 7 + Math.floor(7 * Math.random());
-        levelDefault[2] = 7 + Math.floor(7 * Math.random());
+        levelDefault[0] = 5 + Math.floor(4 * Math.random());
+        levelDefault[1] = 4 + Math.floor(3 * Math.random());
+        levelDefault[2] = 3 + Math.floor(3 * Math.random());
+        levelDefault[3] = 4 + Math.floor(3 * Math.random());
+        levelDefault[4] = 1 + Math.floor(3 * Math.random());
         this.enemyCounts = enemyAmts[this.number] ? enemyAmts[this.number] : levelDefault;
         const isOpen = (idx) => {
             return tileMap[idx - 1] === 1 && tileMap[idx + 1] === 1 && tileMap[idx - 100] === 1 && tileMap[idx + 100] === 1 &&

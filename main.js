@@ -23,6 +23,7 @@ import { EnemyManager } from "./EnemyManager.js";
 import Level from "./Level.js";
 import TextManager from "./TextManager.js";
 import localProxy from "./localProxy.js";
+import { Reflector } from './Reflector.js';
 window.console.warn = () => {};
 async function main() {
     TextManager.element = document.getElementById("textContainer");
@@ -143,8 +144,8 @@ async function main() {
         }
     });
     const renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        // outputEncoding: THREE.sRGBEncoding,
+        antialias: true
+            // outputEncoding: THREE.sRGBEncoding,
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setSize(rWidth, rHeight);
@@ -435,6 +436,16 @@ async function main() {
     });
     entities = level.entities;
     playerController.entities = entities;
+    const groundGeo = new THREE.PlaneGeometry(1000, 1000);
+    const groundReflector = new Reflector(groundGeo, {
+        clipBias: 0.003,
+        textureWidth: 1024,
+        textureHeight: 1024,
+        color: 0xffffff
+    });
+    groundReflector.rotateX(-Math.PI / 2);
+    groundReflector.position.y = 0.25;
+    scene.add(groundReflector);
     const healthBackground = document.getElementById("healthBackground");
     const healthBar = document.getElementById("healthBar");
     const healthLoss = document.getElementById("healthLoss");
@@ -465,6 +476,9 @@ async function main() {
     if (localProxy.damageIndicators !== undefined) {
         document.getElementById("damageIndicators").checked = localProxy.damageIndicators;
     }
+    if (localProxy.reflections !== undefined) {
+        document.getElementById("reflections").checked = localProxy.reflections;
+    }
     const levelDisplay = document.getElementById("levelDisplay");
 
     function animate() {
@@ -474,11 +488,13 @@ async function main() {
             localProxy.musicVolume = document.getElementById("musicVolume").value;
             localProxy.sfxVolume = document.getElementById("sfxVolume").value;
             localProxy.damageIndicators = document.getElementById("damageIndicators").checked;
+            localProxy.reflections = document.getElementById("reflections").checked;
         }
         window.damageIndicators = document.getElementById("damageIndicators").checked;
         renderer.setPixelRatio(0.5 + Math.min(document.getElementById("renderScale").value / 100, 0.5) + 2 * Math.max(document.getElementById("renderScale").value / 100 - 0.5, 0));
         backgroundMusic.setVolume(document.getElementById("musicVolume").value / 100);
         window.sfxVolume = 1 + 2 * (document.getElementById("sfxVolume").value / 100 - 0.5);
+        groundReflector.visible = document.getElementById("reflections").checked;
         levelDisplay.innerHTML = `Level: ${level.number + 1}`;
         if (level.number === 5) {
             levelDisplay.style.top = "88px";
@@ -574,6 +590,7 @@ async function main() {
                         localProxy.sfxVolume = 50;
                         localProxy.renderScale = 50;
                         localProxy.damageIndicators = true;
+                        localProxy.reflections = true;
                         setInterval(() => {
                             localProxy.levelNumber = 0;
                             localProxy.displayedTexts = [];
@@ -581,6 +598,7 @@ async function main() {
                             localProxy.sfxVolume = 50;
                             localProxy.renderScale = 50;
                             localProxy.damageIndicators = true;
+                            localProxy.reflections = true;
                         });
                         window.restarting = true;
                         location.reload();

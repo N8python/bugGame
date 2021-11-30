@@ -19,7 +19,7 @@ const script = {
     
     Use the mouse to look around.
     
-    Use WASD to move around.
+    Use WASD to move around and space to jump.
     
     Click to attack.
     Right click to block.

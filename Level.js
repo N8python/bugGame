@@ -216,7 +216,7 @@ class Level {
             }
         }
         const station = new Station(models.station.scene, models.station.animations, {
-            position: new THREE.Vector3((placeX - 50) * 5, 6.5, (placeY - 50) * 5),
+            position: new THREE.Vector3((placeX - 50) * 5, 6.4, (placeY - 50) * 5),
             camera,
             scene,
             resetFunction,

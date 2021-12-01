@@ -15,13 +15,14 @@
 </head>
 
 <body>
-    <div style="background-color:black;width:200px;height:33px;position:absolute;left: 1.25%;top: 2.5%;" id="healthBackground"></div>
-    <div style="background-color:lime;width:192px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 4px);" id="healthBar"></div>
-    <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 4px);" id="healthLoss"></div>
-    <div style="background-color:black;width:200px;height:33px;position:absolute;left: 1.25%;top: calc(2.5% + 37px);" id="enemyBackground"></div>
-    <div style="background-color:red;width:192px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);" id="enemyBar"></div>
-    <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);" id="enemyLoss"></div>
-    <div id="levelDisplay" style="font-size:30px;position:absolute;top:52px;left:20px;" class="glow-text">Level: 1</div>
+    <img id="damageOverlay" src="assets/images/blood.png" style="z-index:1;width:99%;overflow:hidden;position:absolute;max-height:98%;pointer-events:none;opacity:0;">
+    <div style="background-color:black;width:200px;height:33px;position:absolute;left: 1.25%;top: 2.5%;z-index:2" id="healthBackground"></div>
+    <div style="background-color:lime;width:192px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 4px);z-index:2;" id="healthBar"></div>
+    <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 4px);z-index:2;" id="healthLoss"></div>
+    <div style="background-color:black;width:200px;height:33px;position:absolute;left: 1.25%;top: calc(2.5% + 37px);z-index:2;" id="enemyBackground"></div>
+    <div style="background-color:red;width:192px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);z-index:2;" id="enemyBar"></div>
+    <div style="background-color:white;width:0px;height:25px;position:absolute;left: calc(1.25% + 4px);top: calc(2.5% + 41px);z-index:2;" id="enemyLoss"></div>
+    <div id="levelDisplay" style="font-size:30px;position:absolute;top:52px;left:20px;z-index:2;" class="glow-text">Level: 1</div>
     <img id="crosshair" style="position: absolute; top:50%;left:50%;transform:translate(-50%, -50%);z-index:5;width:16px;height:16px;opacity: 0.75;" src="assets/images/crosshair.png"></img>
     <div id="death" style="display:none">
         <h1 style="position: absolute; top:50%;left:50%;transform:translate(-50%, -200%);z-index:5;font-size:120px;color:white;" class="glow-text">You&nbsp;died!</h1>
@@ -39,10 +40,10 @@
     </div>
     <img id="coverScreen" src="assets/images/titlescreen.png" style="z-index:30;width:99%;overflow:hidden;position:absolute;max-height:98%;">
     <h1 id="load" class="glow-text" style="position: absolute; top:50%;left:50%;transform:translate(-50%, 125%);z-index:40;font-size:60px;color:white;">Loading...</h1>
-    <div style="background-color: grey;width:48px;height:48px;position:absolute;border-radius:8px;left:calc(100% - 134px);" id="info">
+    <div style="background-color: grey;width:48px;height:48px;position:absolute;border-radius:8px;left:calc(100% - 134px);z-index:2;" id="info">
         <i style="font-size:48px;margin-left:3px;" class="fa fa-gear glow-text"></i>
     </div>
-    <div id="infoDiv" style="display:none;">
+    <div id="infoDiv" style="display:none;z-index:2;">
         <div id="infoBackground" style="position:absolute;left:50%;top:50%;transform: translate(-50%, -50%);background:black;z-index:20;">
             <div style="max-width:calc(99% - 1em);">
                 <div style="height:4px"></div>
@@ -50,7 +51,8 @@
                     <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Use WASD to move, space to jump, and mouse to look around.</p>
                     <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Click to attack, right click to block, shift click to do a fast attack/interact.</p>
                     <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Flip all levers (by clicking them) and kill all enemies to progress to the next level (use your station to do so - click it as well).</p>
-                    <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Damage Indicators: <input style="position:relative;top:7px;" class="glow-box" type="checkbox" id="damageIndicators" checked></p>
+                    <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Damage Indicators (Enemies): <input style="position:relative;top:7px;" class="glow-box" type="checkbox" id="damageIndicators" checked></p>
+                    <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Damage Indicators (Player): <input style="position:relative;top:7px;" class="glow-box" type="checkbox" id="damageIndicatorsPlayer" checked></p>
                     <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Reflections: <input style="position:relative;top:7px;" class="glow-box" type="checkbox" id="reflections" checked></p>
                     <!--<p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">SFX Volume: <input class="terminal-slider" style="position:relative;bottom:1px;left:20px;width:30%;" type="range" min="0" max="100"></p>
                     <p id="textContainer" class="terminal-text" style="white-space: pre-line; overflow-wrap: break-word">Music Volume: <input class="terminal-slider" style="position:relative;bottom:1px;width:30%;" type="range" min="0" max="100"></p>-->

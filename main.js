@@ -479,6 +479,9 @@ async function main() {
     if (localProxy.reflections !== undefined) {
         document.getElementById("reflections").checked = localProxy.reflections;
     }
+    if (localProxy.damageIndicatorsPlayer !== undefined) {
+        document.getElementById("damageIndicatorsPlayer").checked = localProxy.damageIndicatorsPlayer;
+    }
     const levelDisplay = document.getElementById("levelDisplay");
 
     function animate() {
@@ -489,6 +492,7 @@ async function main() {
             localProxy.sfxVolume = document.getElementById("sfxVolume").value;
             localProxy.damageIndicators = document.getElementById("damageIndicators").checked;
             localProxy.reflections = document.getElementById("reflections").checked;
+            localProxy.damageIndicatorsPlayer = document.getElementById("damageIndicatorsPlayer").checked;
         }
         window.damageIndicators = document.getElementById("damageIndicators").checked;
         renderer.setPixelRatio(0.5 + Math.min(document.getElementById("renderScale").value / 100, 0.5) + 2 * Math.max(document.getElementById("renderScale").value / 100 - 0.5, 0));
@@ -591,6 +595,7 @@ async function main() {
                         localProxy.renderScale = 50;
                         localProxy.damageIndicators = true;
                         localProxy.reflections = true;
+                        localProxy.damageIndicatorsPlayer = true;
                         setInterval(() => {
                             localProxy.levelNumber = 0;
                             localProxy.displayedTexts = [];
@@ -599,6 +604,7 @@ async function main() {
                             localProxy.renderScale = 50;
                             localProxy.damageIndicators = true;
                             localProxy.reflections = true;
+                            localProxy.damageIndicatorsPlayer = true;
                         });
                         window.restarting = true;
                         location.reload();

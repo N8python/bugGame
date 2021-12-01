@@ -42,6 +42,8 @@ class PlayerController {
         this.health = 250;
         this.maxHealth = 250;
         this.healthLoss = 0;
+        this.damageOpacity = 0;
+        this.damageElement = document.getElementById("damageOverlay");
         this.controls.getObject().velocity = this.velocity;
         this.raycaster = new THREE.Raycaster();
         this.dentMaterial = dentMap;
@@ -79,6 +81,9 @@ class PlayerController {
             sfx.playerDamage.playbackRate = 1.0 + 1.25 * Math.random();
             sfx.playerDamage.play();
         }
+        if (!this.dead && document.getElementById("damageIndicatorsPlayer").checked) {
+            this.damageOpacity = Math.min((amt / 20), 1);
+        }
     }
     revive() {
         this.health = this.maxHealth;
@@ -97,6 +102,8 @@ class PlayerController {
         }
         this.health = Math.max(this.health, 0);
         this.healthLoss *= 0.9;
+        this.damageElement.style.opacity = this.damageOpacity;
+        this.damageOpacity *= 0.95;
         if (this.onGround) {
             sfx.footsteps.playbackRate = 0.75 + 0.5 * Math.random();
             sfx.footsteps.detune = 100 * (-Math.random() * 6 + 2);

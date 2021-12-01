@@ -82,7 +82,7 @@ class PlayerController {
             sfx.playerDamage.play();
         }
         if (!this.dead && document.getElementById("damageIndicatorsPlayer").checked) {
-            this.damageOpacity = Math.min((amt / 20), 1);
+            this.damageOpacity += Math.min((amt / 20), 1);
         }
     }
     revive() {
